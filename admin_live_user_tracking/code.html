@@ -1,0 +1,390 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@600;700&amp;family=Atkinson+Hyperlegible+Next:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-fixed": "#cbe6ff", "surface-container-high": "#ffe3cd", "primary-container": "#1a5276", "secondary": "#006b58", "on-tertiary-fixed": "#351000", "on-primary-fixed": "#001e30", "on-tertiary-fixed-variant": "#7b2f00", "background": "#fff8f5", "secondary-fixed": "#99f4da", "on-secondary": "#ffffff", "surface-container-low": "#fff1e8", "on-surface": "#2c1602", "primary-fixed-dim": "#9bccf6", "outline": "#72787f", "secondary-fixed-dim": "#7dd7be", "on-tertiary": "#ffffff", "inverse-on-surface": "#ffeee1", "on-secondary-fixed": "#002019", "tertiary-container": "#873400", "surface-container-lowest": "#ffffff", "surface-tint": "#2f6388", "inverse-primary": "#9bccf6", "on-primary-fixed-variant": "#0e4b6e", "surface-variant": "#ffdcbf", "on-primary": "#ffffff", "surface-dim": "#fdd2ae", "tertiary-fixed-dim": "#ffb695", "surface-container-highest": "#ffdcbf", "error-container": "#ffdad6", "on-tertiary-container": "#ffac86", "on-error": "#ffffff", "outline-variant": "#c1c7cf", "primary": "#003b5a", "surface": "#fff8f5", "error": "#ba1a1a", "surface-container": "#ffeadb", "on-error-container": "#93000a", "surface-bright": "#fff8f5", "on-surface-variant": "#41474e", "secondary-container": "#99f4da", "on-background": "#2c1602", "inverse-surface": "#442b12", "tertiary": "#622400", "tertiary-fixed": "#ffdbcc", "on-secondary-fixed-variant": "#005142", "on-secondary-container": "#00725d", "on-primary-container": "#94c5ee" }, "spacing": { "md": "16px", "sm": "8px", "container-margin": "20px", "lg": "24px", "xl": "40px", "xs": "4px", "unit": "4px", "touch-target": "48px", "gutter": "16px" }, "fontFamily": { "label-bold": ["Public Sans"], "body-lg": ["Atkinson Hyperlegible Next"], "status-badge": ["Public Sans"], "headline-lg": ["Public Sans"], "body-md": ["Atkinson Hyperlegible Next"], "headline-lg-mobile": ["Public Sans"], "headline-md": ["Public Sans"] }, "fontSize": { "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}], "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}], "status-badge": ["13px", {"lineHeight": "16px", "fontWeight": "600"}], "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}], "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}], "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}], "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}] } } } }</script><style>@layer base { .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } body { -webkit-tap-highlight-color: transparent; } } </style></head><body class="bg-surface text-on-surface font-body-md"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-margin flex items-center justify-between"><div class="flex items-center gap-sm"><img alt="Village Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI2oc_Spp8I6sgWaFMdsSaFj6HCk6B0FcQPjuW5ESxOxg1qEkS2UujcZNWktzJc8s5jwVXxfZcpXC-_nT7qoyZfCico0MZXOysuOfdYGH_BObereTalqbra5mCuW0jZ4k0JiWCqJUizNUxZ0eoHab6alVwGgUk4JVZXPKdivAOY5RPtWQVl8LjrPw0-RknTkFttseIwCfgur0EmzMkWGVWB07KHOChoA5J8VhKNoq1A7a7uu-LpA0X4w"><span class="font-headline-md text-headline-md text-primary">Admin</span></div><div class="flex items-center gap-xs"><button onclick="logout()" class="text-[11px] text-error font-label-bold uppercase hover:underline mr-2 py-1 px-2 border border-error rounded-full">Logout</button><img alt="Profile" class="w-8 h-8 rounded-full object-cover border-2 border-primary-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9xl8M-8NUe2E-4TJUhfwoMlXWQVlOo8FbTAZqNrSnRR9n-xWoRkdxOiZ0gYvn2EEz2gdPSVbHCoVyu5cvyDyfJKN4I5NOsjR-sZIEUPPEf4W2S016llIQ4HI7CYcPFTdXF0ToDf0kE95ABGN3kxKHHAmi_4iHRaeqsgRVmU8YmfpghDR-hApGUFwoNvXr5ALTMF3F-s3NV42JV1UDqwfKhb8lpovhvJKnIQN5IGMG0dGHvu5LzFvSNQ"></div></div></header><main class="relative w-full pt-16 pb-24 bg-surface"><div class="flex flex-col w-full h-full">
+<!-- Overview Section -->
+<section class="px-container-margin py-xl bg-surface-container-low border-b border-outline-variant/30 flex flex-col gap-lg">
+<div class="flex flex-col gap-xs">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Live Oversight</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Real-time community network monitoring.</p>
+</div>
+<!-- Top Metrics -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-sm">
+<div class="bg-surface p-md rounded-xl border border-outline-variant flex flex-col gap-sm">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span class="font-label-bold text-label-bold uppercase">Total Users</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-primary">1,248</div>
+</div>
+<div class="bg-primary-container p-md rounded-xl border border-primary flex flex-col gap-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 p-sm">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-secondary"></span>
+</span>
+</div>
+<div class="flex items-center gap-xs text-on-primary-container">
+<span class="material-symbols-outlined text-[18px]">sensors</span>
+<span class="font-label-bold text-label-bold uppercase">Live Now</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-on-primary-container">42</div>
+</div>
+<div class="bg-surface p-md rounded-xl border border-outline-variant flex flex-col gap-sm">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">login</span>
+<span class="font-label-bold text-label-bold uppercase">Recent Logins</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-primary">15</div>
+</div>
+<div class="bg-surface p-md rounded-xl border border-outline-variant flex flex-col gap-sm">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">report_problem</span>
+<span class="font-label-bold text-label-bold uppercase">Active Reports</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-error">3</div>
+</div>
+</div>
+</section>
+<!-- Interactive Map Section -->
+<section class="p-container-margin flex flex-col gap-md">
+<div class="flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md text-on-surface">Network Map</h2>
+<button class="flex items-center gap-xs text-primary font-label-bold text-label-bold px-md py-sm border-2 border-primary rounded-full hover:bg-primary-container hover:text-on-primary-container transition-colors min-h-touch-target">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+        FILTER
+      </button>
+</div>
+<!-- Stylized Map Container -->
+<div class="w-full h-[300px] md:h-[400px] rounded-xl border border-outline-variant relative overflow-hidden bg-on-surface flex items-center justify-center">
+<!-- Image from prompt reference -->
+<img alt="Village Map" class="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-luminosity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtpYsncGBwGHHNJEoPjiOCfXVO5KSpQBExEfJKNWsNtn7cqF_GE7fZhbg8ofI-ucqsGKu0Nfo8pODOR_DNpx20VUqrlQMcMnfA8nH8tvc56_4P_1fgpjCixxwPMEJ4Y9mxrFEOBHXzJnvtKCiLG4XALVbKkI0w5kp3jXTgM0haSh0Q9teNfIiGvCEnAvon-kBIaPopmZQhcs-heoCN3f1Q9Vg8YTO0JQ64c2ViuHgiuSrdplT58RtnJg">
+<!-- Simulated Glowing Markers -->
+<div class="absolute inset-0 z-10 p-4 relative">
+<!-- Marker 1 -->
+<div class="absolute top-[30%] left-[20%] flex items-center justify-center">
+<div class="animate-ping absolute h-8 w-8 rounded-full bg-secondary-fixed opacity-60"></div>
+<div class="relative h-4 w-4 rounded-full bg-secondary shadow-[0_0_15px_rgba(0,107,88,0.8)] border-2 border-surface"></div>
+</div>
+<!-- Marker 2 -->
+<div class="absolute top-[60%] left-[45%] flex items-center justify-center">
+<div class="animate-ping absolute h-6 w-6 rounded-full bg-secondary-fixed opacity-60" style="animation-delay: 0.5s;"></div>
+<div class="relative h-3 w-3 rounded-full bg-secondary shadow-[0_0_15px_rgba(0,107,88,0.8)] border-2 border-surface"></div>
+</div>
+<!-- Marker 3 -->
+<div class="absolute top-[40%] right-[30%] flex items-center justify-center">
+<div class="animate-ping absolute h-10 w-10 rounded-full bg-secondary-fixed opacity-60" style="animation-delay: 1.2s;"></div>
+<div class="relative h-5 w-5 rounded-full bg-secondary shadow-[0_0_15px_rgba(0,107,88,0.8)] border-2 border-surface"></div>
+</div>
+</div>
+<!-- Map Overlay UI -->
+<div class="absolute bottom-4 left-4 right-4 bg-surface/90 backdrop-blur-sm border border-outline-variant p-sm rounded-lg flex items-center justify-between z-20">
+<div class="flex items-center gap-sm">
+<div class="h-3 w-3 rounded-full bg-secondary"></div>
+<span class="font-label-bold text-label-bold text-on-surface">Active Connection</span>
+</div>
+<button class="text-primary hover:text-primary-container p-2 rounded-full flex items-center justify-center min-h-touch-target min-w-[48px]">
+<span class="material-symbols-outlined">zoom_in_map</span>
+</button>
+</div>
+</div>
+</section>
+
+<!-- Active Sessions Section -->
+<section class="px-container-margin py-md flex flex-col gap-md">
+  <h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm">
+    <span class="material-symbols-outlined text-secondary">person_pin_circle</span>
+    Active Sessions — Login Locations
+  </h2>
+  <div id="active-sessions-container" class="flex flex-col gap-sm">
+    <p class="text-sm text-on-surface-variant italic">Loading sessions...</p>
+  </div>
+</section>
+
+<!-- User Management Panel -->
+<section class="px-container-margin pb-md flex flex-col gap-md">
+  <h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm">
+    <span class="material-symbols-outlined text-secondary">manage_accounts</span>
+    User Management & Passwords
+  </h2>
+  <div class="bg-surface border border-outline-variant rounded-xl p-md flex flex-col gap-md">
+    <form id="whitelistForm" class="flex flex-col md:flex-row gap-sm items-end">
+      <div class="flex-1 flex flex-col gap-xs">
+        <label class="font-label-bold text-label-bold text-on-surface uppercase" for="whitelistEmail">Email Address</label>
+        <input class="w-full min-h-[48px] px-md bg-surface-container-low text-on-surface rounded border border-outline-variant focus:outline-none" id="whitelistEmail" placeholder="email@village.gov.in" required type="email"/>
+      </div>
+      <div class="flex-1 flex flex-col gap-xs">
+        <label class="font-label-bold text-label-bold text-on-surface uppercase" for="whitelistRole">Assigned Role</label>
+        <select class="w-full min-h-[48px] px-md bg-surface-container-low text-on-surface rounded border border-outline-variant focus:outline-none" id="whitelistRole">
+          <option>Admin</option>
+          <option>Sarpanch</option>
+          <option>People/User</option>
+        </select>
+      </div>
+      <button class="min-h-[48px] px-lg bg-primary text-on-primary font-label-bold rounded hover:bg-primary/95 transition-colors uppercase" type="submit">Add/Update Role</button>
+    </form>
+    
+    <div class="border-t border-outline-variant pt-sm">
+      <h3 class="font-label-bold text-label-bold text-on-surface mb-sm">Registered Users</h3>
+      <div id="whitelist-accounts-list" class="flex flex-col gap-sm max-h-64 overflow-y-auto">
+        <!-- User entries populated dynamically -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Live User Feed -->
+<section class="px-container-margin pb-xl flex flex-col gap-md">
+<h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary animate-pulse">sensors</span>
+        Live Activity Feed
+     </h2>
+<div id="activity-feed-container" class="flex flex-col gap-sm">
+  <!-- Dynamic Activity Feed Items Populate Here -->
+</div>
+</section>
+</div>
+<script>
+async function loadAdminPageData() {
+  try {
+    const feedRes = await fetch('/api/admin/feed');
+    const feedData = await feedRes.json();
+
+    // Update Counters — Total Users, Live Now (active sessions), Recent Logins, Active Reports
+    const counters = document.querySelectorAll('.font-headline-lg-mobile');
+    if (counters[0]) counters[0].textContent = feedData.totalUsers;
+    if (counters[1]) counters[1].textContent = feedData.activeSessions;
+    if (counters[3]) counters[3].textContent = feedData.activeReports;
+
+    // ── Fetch and Render Active Sessions ──
+    const sessionsRes = await fetch('/api/admin/sessions');
+    const sessions = await sessionsRes.json();
+    const sessionsContainer = document.getElementById('active-sessions-container');
+    sessionsContainer.innerHTML = '';
+
+    if (sessions.length === 0) {
+      sessionsContainer.innerHTML = '<p class="text-sm text-on-surface-variant italic">No active sessions right now.</p>';
+    } else {
+      // Update "Recent Logins" counter with session count
+      if (counters[2]) counters[2].textContent = sessions.length;
+
+      sessions.forEach(s => {
+        const loginTime = new Date(s.loginTime);
+        const timeStr = loginTime.toLocaleString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true, day: 'numeric', month: 'short' });
+
+        sessionsContainer.innerHTML += `
+          <div class="bg-surface border border-outline-variant rounded-xl p-md flex gap-md items-start">
+            <span class="material-symbols-outlined text-4xl text-secondary mt-1">person_pin_circle</span>
+            <div class="flex flex-col flex-1 gap-xs min-w-0">
+              <div class="flex justify-between items-start gap-2">
+                <h3 class="font-body-md font-bold text-on-surface truncate">${s.name} <span class="text-xs font-normal text-on-surface-variant">(${s.email})</span></h3>
+                <span class="font-label-bold text-[10px] text-on-primary shrink-0 uppercase tracking-wide bg-primary px-2 py-1 rounded">${s.role}</span>
+              </div>
+              <div class="flex items-center gap-xs text-on-surface-variant">
+                <span class="material-symbols-outlined text-[16px]">location_on</span>
+                <span class="font-body-md text-sm">${s.location}</span>
+              </div>
+              <div class="flex items-center gap-xs text-on-surface-variant">
+                <span class="material-symbols-outlined text-[16px]">schedule</span>
+                <span class="font-body-md text-sm">${timeStr}</span>
+                <span class="mx-1">·</span>
+                <span class="material-symbols-outlined text-[16px]">wifi</span>
+                <span class="font-body-md text-sm">${s.ip}</span>
+              </div>
+            </div>
+            <button onclick="kickSession('${s.email}')" class="text-xs text-error font-label-bold hover:underline self-center" title="Force logout">Kick</button>
+          </div>
+        `;
+      });
+    }
+
+    // ── Render Activity Feed with location ──
+    const feedContainer = document.getElementById('activity-feed-container');
+    feedContainer.innerHTML = '';
+    
+    if (feedData.feed.length === 0) {
+      feedContainer.innerHTML = '<p class="text-sm text-on-surface-variant italic">No recent activity logs.</p>';
+    } else {
+      feedData.feed.forEach(item => {
+        // Format time — handle both ISO strings and old "Just Now" strings
+        let timeDisplay = item.time;
+        if (item.time && item.time.includes('T')) {
+          const d = new Date(item.time);
+          const now = new Date();
+          const diffMs = now - d;
+          const diffMin = Math.floor(diffMs / 60000);
+          if (diffMin < 1) timeDisplay = 'Just Now';
+          else if (diffMin < 60) timeDisplay = diffMin + 'm ago';
+          else if (diffMin < 1440) timeDisplay = Math.floor(diffMin / 60) + 'h ago';
+          else timeDisplay = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        }
+
+        const locationHtml = item.location
+          ? `<div class="flex items-center gap-xs text-on-surface-variant mt-1">
+               <span class="material-symbols-outlined text-[14px]">location_on</span>
+               <span class="text-xs">${item.location}</span>
+             </div>`
+          : '';
+
+        feedContainer.innerHTML += `
+          <div class="bg-surface border border-outline-variant rounded-xl p-md flex gap-md items-start">
+            <span class="material-symbols-outlined text-4xl text-on-surface-variant mt-1">account_circle</span>
+            <div class="flex flex-col flex-1 gap-xs min-w-0">
+              <div class="flex justify-between items-start gap-2">
+                <h3 class="font-body-md font-bold text-on-surface truncate">${item.name}</h3>
+                <span class="font-label-bold text-[10px] text-on-surface-variant shrink-0 uppercase tracking-wide bg-surface-container-high px-2 py-1 rounded">${timeDisplay}</span>
+              </div>
+              <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">${item.action}</p>
+              ${locationHtml}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // ── Render Users and Passwords ──
+    const usersRes = await fetch('/api/admin/users');
+    const users = await usersRes.json();
+    const whitelistContainer = document.getElementById('whitelist-accounts-list');
+    whitelistContainer.innerHTML = '';
+
+    users.forEach(user => {
+      whitelistContainer.innerHTML += `
+        <div class="flex justify-between items-center bg-surface-container-low p-sm rounded border border-outline-variant">
+          <div>
+            <p class="font-body-md font-bold text-on-surface">${user.email}</p>
+            <p class="text-xs text-on-surface-variant flex items-center gap-2 mt-1">
+              <span class="bg-primary/10 text-primary px-2 py-0.5 rounded font-label-bold uppercase">${user.role}</span>
+              <span class="font-mono text-on-surface">Pass: ${user.password}</span>
+            </p>
+          </div>
+          <div class="flex items-center gap-xs">
+            <button onclick="changePassword('${user.email}')" class="p-xs text-secondary hover:bg-secondary/10 rounded-full transition-colors" title="Change Password">
+              <span class="material-symbols-outlined text-[20px]">key</span>
+            </button>
+            <button onclick="removeRole('${user.email}')" class="p-xs text-error hover:bg-error/10 rounded-full transition-colors" title="Remove User">
+              <span class="material-symbols-outlined text-[20px]">delete</span>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function changePassword(email) {
+  const newPass = prompt(`Enter new password for ${email}:`);
+  if (!newPass) return;
+  try {
+    const res = await fetch(`/api/admin/users/${email}/password`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: newPass })
+    });
+    if (res.ok) {
+      loadAdminPageData();
+    } else {
+      alert("Failed to update password.");
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// Add user to whitelist
+document.getElementById('whitelistForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('whitelistEmail').value;
+  const role = document.getElementById('whitelistRole').value;
+  
+  try {
+    const res = await fetch('/api/admin/roles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, role })
+    });
+    if (res.ok) {
+      document.getElementById('whitelistEmail').value = '';
+      loadAdminPageData();
+    } else {
+      alert("Failed to update roles whitelists.");
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+// Remove user from whitelist
+async function removeRole(email) {
+  if (!confirm(`Are you sure you want to remove ${email}?`)) return;
+  try {
+    const res = await fetch('/api/admin/roles', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    if (res.ok) {
+      loadAdminPageData();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// Kick active session (force logout a user)
+async function kickSession(email) {
+  if (!confirm(`Force logout ${email}?`)) return;
+  try {
+    const res = await fetch('/api/admin/sessions', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    if (res.ok) {
+      loadAdminPageData();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function verifyAdminAuth() {
+  try {
+    const authRes = await fetch('/api/auth/status');
+    const authData = await authRes.json();
+    if (!authData.loggedIn) {
+      window.location.href = '/login';
+      return;
+    }
+    const role = authData.user.role;
+    if (role !== 'Admin') {
+      alert("Access Denied: Admin dashboard is restricted to administrators.");
+      window.location.href = '/home';
+      return;
+    }
+    loadAdminPageData();
+  } catch (err) {
+    console.error(err);
+  }
+}
+verifyAdminAuth();
+
+async function logout() {
+  if (!confirm("Are you sure you want to logout?")) return;
+  try {
+    const res = await fetch('/api/auth/logout', { method: 'POST' });
+    if (res.ok) window.location.href = '/login';
+  } catch(e) { console.error(e); }
+}
+</script>
+</main>
+<nav class="fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-xl pb-safe shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary font-bold">
+<div class="flex justify-between items-center h-16 px-gutter">
+<a class="flex flex-col items-center justify-center min-w-[64px] text-on-surface-variant transition-colors" data-path="home" href="/home"><span class="material-symbols-outlined">home</span><span class="font-label-bold text-[10px] uppercase tracking-wider">Home</span></a>
+<a class="flex flex-col items-center justify-center min-w-[64px] text-on-surface-variant transition-colors" data-path="report" href="/report"><span class="material-symbols-outlined">report_problem</span><span class="font-label-bold text-[10px] uppercase tracking-wider">Report</span></a>
+<a class="flex flex-col items-center justify-center min-w-[64px] text-on-surface-variant transition-colors" data-path="tasks" href="/tasks"><span class="material-symbols-outlined">assignment_turned_in</span><span class="font-label-bold text-[10px] uppercase tracking-wider">Tasks</span></a>
+<a aria-current="page" class="flex flex-col items-center justify-center min-w-[64px] transition-colors text-primary font-bold" data-path="admin" href="/admin"><span class="material-symbols-outlined">monitoring</span><span class="font-label-bold text-[10px] uppercase tracking-wider">Admin</span></a>
+<a class="flex flex-col items-center justify-center min-w-[64px] text-on-surface-variant transition-colors" data-path="support" href="/support"><span class="material-symbols-outlined">mail</span><span class="font-label-bold text-[10px] uppercase tracking-wider">Support</span></a>
+</div>
+</nav>
+</body></html>
