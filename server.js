@@ -351,8 +351,7 @@ app.delete('/api/admin/roles', requireAuth(['Admin']), async (req, res) => {
 
 app.get('/api/admin/sessions', requireAuth(['Admin', 'Sarpanch']), async (req, res) => {
   const sessions = await ActiveSession.find({}, { _id: 0, __v: 0 });
-  const feedItems = await Feed.find({}, { _id: 0, __v: 0 }).sort({ id: -1 }).limit(50);
-  res.json({ sessions, feed: feedItems });
+  res.json(sessions);
 });
 
 app.delete('/api/admin/sessions', requireAuth(['Admin']), async (req, res) => {
