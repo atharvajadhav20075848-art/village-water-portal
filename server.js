@@ -300,6 +300,13 @@ function requireAuth(allowedRoles) {
 }
 
 // ── Admin Routes ────────────────────────────────────────────
+app.get('/api/admin/feed', requireAuth(['Admin']), async (req, res) => {
+  const totalUsers = await User.countDocuments();
+  const activeSessions = await ActiveSession.countDocuments();
+  const activeReports = await Issue.countDocuments({ status: { $ne: 'Resolved' } });
+  const feed = await Feed.find({}, { _id: 0, __v: 0 }).sort({ id: -1 }).limit(50);
+  res.json({ totalUsers, activeSessions, activeReports, feed });
+});
 app.get('/api/admin/users', requireAuth(['Admin']), async (req, res) => {
   const users = await User.find({}, { _id: 0, __v: 0 });
   res.json(users);
@@ -433,7 +440,7 @@ const pages = {
   '/report': 'report_an_issue',
   '/admin': 'admin_live_user_tracking',
   '/tasks': 'sarpanch_task_verification',
-  '/support': 'support'
+  '/support': 'contact_support'
 };
 
 Object.entries(pages).forEach(([route, folder]) => {
