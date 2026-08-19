@@ -1,0 +1,266 @@
+{
+  "roles": {
+    "admin@village.gov.in": "Admin",
+    "sarpanch@village.gov.in": "Sarpanch",
+    "resident@village.gov.in": "People/User",
+    "rahul@village.gov.in": "People/User",
+    "sunita@village.gov.in": "People/User"
+  },
+  "passwords": {
+    "admin@village.gov.in": "admin123",
+    "sarpanch@village.gov.in": "sarpanch123",
+    "resident@village.gov.in": "user123",
+    "rahul@village.gov.in": "rahul123",
+    "sunita@village.gov.in": "sunita123"
+  },
+  "issues": [
+    {
+      "id": 1,
+      "title": "Broken Pipe Leak",
+      "type": "Water Related Issue",
+      "description": "Main supply pipe is leaking heavily. Water is pooling on the main road causing mud and wasting significant water volume since morning.",
+      "location": "Near North Water Tank",
+      "gps": "26.1234, 75.3456",
+      "photoUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCUBz4UpeT6enN1eSPMr7ODmQwZby40qZD6xQMeXvRXQFPKldjdfhGnyvjHbJhAGscVY-N_wRYNoDJqWYbqc8XE2jVrnjaT4uRntK8pOP5s0NJLCGu2V_T9frGiCvUWs60LX72e2uTRdQn9XvsHILNy541ifL3hYtH2slz9iVrKZkkdDr8EPUuJvdbUlbmPZb6-gO9nsEp4LV4EkzIHxdoAJ_iQ8BE_fPCkVHWxBIkEbPwWrUtsZpR2nA",
+      "status": "solved",
+      "reporter": "Rahul Sharma",
+      "dateRaised": "2026-08-19T08:30:00Z",
+      "dateResolved": "2026-08-19T15:45:57.363Z"
+    },
+    {
+      "id": 2,
+      "title": "Handpump Handle Broken",
+      "type": "Water Related Issue",
+      "description": "The iron handle of the community handpump snapped off. Needs welding or replacement. People cannot draw water currently.",
+      "location": "Ward 4, Near Panchayat Bhavan",
+      "gps": "26.1288, 75.3412",
+      "photoUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCZBEAldr581AnrQIAtia15QYrn5nF0mkVpkIEsgPcvihPzMWfpybWNZwd-tXdQaCQ7WHNNso4srwbD4L-eZvMfrXVuddKWC6GJri2J0lvlFXOAisnZfw4jic8SN0cY4avIwdWv2HSyfFU4Oq4Ka-B_f5gfcCYoogOlnZQpvqqoY4ckeOS5SGYOoPuKxq4STDB0ggohVS2VpAX6VdtuhGmkMDay-hGAXy-jQocF22m48mgfb-oWCOjD1Q",
+      "status": "solved",
+      "reporter": "Sunita Devi",
+      "dateRaised": "2026-08-19T10:15:00Z",
+      "dateResolved": "2026-08-19T15:46:00.522Z"
+    },
+    {
+      "id": 3,
+      "title": "Well Contamination",
+      "type": "Water Related Issue",
+      "description": "Debris cleared and well chlorinated. Water tested safe.",
+      "location": "Sector 2 Main Well",
+      "gps": "26.1211, 75.3499",
+      "photoUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuB5EZIkatW3Cnc4zQZiJdoTgd2J-RF4udnQDqRdCYg4MqksXNH-AJnYkn6rUlEd7uCXnX-51uAK0u5H-Q4iv_gVz2wcVxQedvE86eLU1-Dh-if2o6N0mpXglXfqQO6GSKVcMg_Q41s4TyfzzZ5c17e48qJJQ-1I7Y6tOs3NBixTYNXgTr4KbpYvDT9uPbFzpDqRJCvYpYc6GvVzWuSJyUC0kTe6Qrg0gfWQ4LU-TJ3cM_gbJ8KPzfpTeA",
+      "status": "solved",
+      "reporter": "Maria Santos",
+      "dateRaised": "2026-08-15T09:00:00Z",
+      "dateResolved": "2026-08-17T14:00:00Z"
+    }
+  ],
+  "feed": [
+    {
+      "id": 1787155741520,
+      "name": "admin",
+      "time": "2026-08-19T16:09:01.520Z",
+      "action": "Logged in manually as Admin.",
+      "location": "GPS: 21.2292, 78.9061",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787155697569,
+      "name": "admin",
+      "time": "2026-08-19T16:08:17.569Z",
+      "action": "Logged out.",
+      "location": "GPS: 21.2293, 78.9061",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787155655103,
+      "name": "admin",
+      "time": "2026-08-19T16:07:35.103Z",
+      "action": "Logged in manually as Admin.",
+      "location": "GPS: 21.2293, 78.9061",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787155655097,
+      "name": "admin",
+      "time": "2026-08-19T16:07:35.097Z",
+      "action": "Logged in manually as Admin.",
+      "location": "GPS: 21.2293, 78.9061",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787155189178,
+      "name": "admin",
+      "time": "2026-08-19T15:59:49.178Z",
+      "action": "Logged out.",
+      "location": "GPS: 21.2292, 78.9061",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787155168077,
+      "name": "admin",
+      "time": "2026-08-19T15:59:28.077Z",
+      "action": "Logged in manually as Admin.",
+      "location": "GPS: 21.2292, 78.9061",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787155155007,
+      "name": "admin",
+      "time": "2026-08-19T15:59:15.007Z",
+      "action": "Logged in manually as Admin.",
+      "location": "GPS: 21.2292, 78.9061",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787154570152,
+      "name": "admin",
+      "time": "2026-08-19T15:49:30.152Z",
+      "action": "Logged out.",
+      "location": "Pune, Maharashtra, India",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787154523970,
+      "name": "admin",
+      "time": "2026-08-19T15:48:43.970Z",
+      "action": "Logged in as Admin.",
+      "location": "Pune, Maharashtra, India",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787154519945,
+      "name": "resident",
+      "time": "2026-08-19T15:48:39.945Z",
+      "action": "Logged out.",
+      "location": "Pune, Maharashtra, India",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787154385376,
+      "name": "resident",
+      "time": "2026-08-19T15:46:25.376Z",
+      "action": "Logged in as People/User.",
+      "location": "Pune, Maharashtra, India",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787154373779,
+      "name": "sarpanch",
+      "time": "2026-08-19T15:46:13.779Z",
+      "action": "Logged out.",
+      "location": "Pune, Maharashtra, India",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787154360522,
+      "name": "sarpanch",
+      "time": "2026-08-19T15:46:00.522Z",
+      "action": "Marked issue resolved: Handpump Handle Broken",
+      "location": "Pune, Maharashtra, India",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787154357363,
+      "name": "sarpanch",
+      "time": "2026-08-19T15:45:57.363Z",
+      "action": "Marked issue resolved: Broken Pipe Leak",
+      "location": "Pune, Maharashtra, India",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787154343503,
+      "name": "sarpanch",
+      "time": "2026-08-19T15:45:43.503Z",
+      "action": "Logged in as Sarpanch.",
+      "location": "Pune, Maharashtra, India",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787154319721,
+      "name": "admin",
+      "time": "2026-08-19T15:45:19.721Z",
+      "action": "Logged out.",
+      "location": "Pune, Maharashtra, India",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787154309093,
+      "name": "admin",
+      "time": "2026-08-19T15:45:09.093Z",
+      "action": "Logged in as Admin.",
+      "location": "Pune, Maharashtra, India",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787153922851,
+      "name": "admin",
+      "time": "2026-08-19T15:38:42.851Z",
+      "action": "Logged in as Admin.",
+      "location": "Local Network, Localhost",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787153131173,
+      "name": "Admin User",
+      "time": "2026-08-19T15:25:31.173Z",
+      "action": "Logged in as Admin.",
+      "location": "Local Network, Localhost",
+      "ip": "::1",
+      "phone": "N/A"
+    },
+    {
+      "id": 1787151152723,
+      "name": "admin",
+      "time": "Just Now",
+      "action": "Logged in as Admin.",
+      "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuB9xl8M-8NUe2E-4TJUhfwoMlXWQVlOo8FbTAZqNrSnRR9n-xWoRkdxOiZ0gYvn2EEz2gdPSVbHCoVyu5cvyDyfJKN4I5NOsjR-sZIEUPPEf4W2S016llIQ4HI7CYcPFTdXF0ToDf0kE95ABGN3kxKHHAmi_4iHRaeqsgRVmU8YmfpghDR-hApGUFwoNvXr5ALTMF3F-s3NV42JV1UDqwfKhb8lpovhvJKnIQN5IGMG0dGHvu5LzFvSNQ",
+      "phone": "N/A"
+    },
+    {
+      "id": 1,
+      "name": "Maria Santos",
+      "time": "Just Now",
+      "action": "Logged in from Sector 4. Viewed water schedule.",
+      "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuAB3snLy4sHJuVzbcR10ZrbC0eWpvyOCRj6Nng458wSO5m6V0wvgBgqcGkexYM0I1PHqYpbnAn-Xlaw_l5mAIyLCEEY_kg5Zt5w8WT-KzVVMBT6Duvugrazs78UeLZLgG0JudQiI6aCqBhoBuDNh6I0RcdWOJNvCX9LnuB0j48VGJRY2S2JMlJQjCvyKQgywou62XIX9lL4xfPpdJTCKezMusWRjHO9G4Ouagc74P7OyTkdIi-Ze3W4eQ",
+      "phone": "555-0192"
+    },
+    {
+      "id": 2,
+      "name": "Rahul Sharma",
+      "time": "15m ago",
+      "action": "Submitted a new report: Broken Pipe Leak",
+      "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuD8s_goFZu3JrsOZKY8lwG8KhFhLxJibhI0sDl4BOFqYy9IjB_1JITWUXUL8l3MX_aZivoywdbDRmmmvQGaq5GdS3AV5RSXcO-Y-YmMsGNADCpWG3750Ulgp9KrooZwVGaRYjy1pJ2vxwYkoutECfA1LMMsWRGep4nzZiw3G_8AYShvFWIxMXv649t1bTAWOCq78F4fRa47CM1efyck4OOu_-wEEqGuzMvnoG2H1Wxsxse7eN_1qi8eCQ",
+      "phone": "555-0184"
+    }
+  ],
+  "sessions": [
+    {
+      "email": "admin@village.gov.in",
+      "name": "admin",
+      "role": "Admin",
+      "ip": "::1",
+      "location": "GPS: 21.2292, 78.9061",
+      "loginTime": "2026-08-19T16:09:01.520Z",
+      "lat": 21.22924816561233,
+      "lon": 78.90608917983239
+    }
+  ]
+}
