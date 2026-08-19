@@ -109,7 +109,7 @@ async function checkAuthAndLoad() {
     // Load dynamic issues
     const res = await fetch('/api/issues');
     const issues = await res.json();
-    const solved = issues.filter(i => i.status === 'solved');
+    const solved = issues.filter(i => i.status === 'Resolved');
     const container = document.getElementById('recent-fixes-container');
     container.innerHTML = '';
     

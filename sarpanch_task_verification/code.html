@@ -78,7 +78,7 @@
         const res = await fetch('/api/issues');
         const issues = await res.json();
         
-        const pendingCount = issues.filter(i => i.status === 'pending').length;
+        const pendingCount = issues.filter(i => i.status === 'Pending').length;
         btnPending.textContent = `Pending (${pendingCount})`;
 
         const containerPending = document.getElementById('view-pending');
@@ -87,8 +87,8 @@
         containerPending.innerHTML = '';
         containerSolved.innerHTML = '';
 
-        const pendingItems = issues.filter(i => i.status === 'pending');
-        const solvedItems = issues.filter(i => i.status === 'solved');
+        const pendingItems = issues.filter(i => i.status === 'Pending');
+        const solvedItems = issues.filter(i => i.status === 'Resolved');
 
         if (pendingItems.length === 0) {
           containerPending.innerHTML = '<p class="text-sm text-on-surface-variant italic p-4 text-center">No pending tasks.</p>';
@@ -176,7 +176,7 @@
 
         try {
           const res = await fetch(`/api/issues/${id}/resolve`, {
-            method: 'POST',
+            method: 'PUT',
             body: formData
           });
           if (res.ok) {
