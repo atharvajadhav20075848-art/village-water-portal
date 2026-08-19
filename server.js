@@ -404,6 +404,12 @@ app.post('/api/issues', requireAuth(), upload.single('photo'), async (req, res) 
   res.json({ success: true, issue: newIssue });
 });
 
+app.delete('/api/issues/:id', requireAuth(['Admin']), async (req, res) => {
+  const issueId = parseInt(req.params.id, 10);
+  await Issue.findOneAndDelete({ id: issueId });
+  res.json({ success: true });
+});
+
 app.put('/api/issues/:id/resolve', requireAuth(['Admin', 'Sarpanch']), upload.single('photo'), async (req, res) => {
   const issueId = parseInt(req.params.id, 10);
   

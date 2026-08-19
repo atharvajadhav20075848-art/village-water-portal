@@ -125,8 +125,8 @@ async function checkAuthAndLoad() {
             <div>
               <h4 class="font-headline-md text-headline-md text-on-surface mb-xs">${item.title}</h4>
               <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs">
-                <span class="material-symbols-outlined text-[16px]">location_on</span>
-                ${item.location}
+                <span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
+                <a href="https://www.google.com/maps?q=${item.lat},${item.lon}" target="_blank" class="text-primary underline hover:opacity-80">${item.location}</a>
               </p>
             </div>
             <div class="bg-secondary text-on-secondary px-sm py-xs flex items-center gap-xs rounded-sm">
@@ -135,8 +135,8 @@ async function checkAuthAndLoad() {
             </div>
           </div>
           <div class="grid grid-cols-1 gap-sm mb-md">
-            <div class="relative">
-              <div class="w-full h-48 bg-cover bg-center border border-outline-variant" style="background-image: url('${item.photoUrl}')"></div>
+            <div class="relative cursor-pointer" onclick="openLightbox('${item.photoUrl}')" title="Click to view full image">
+              <div class="w-full h-48 bg-cover bg-center border border-outline-variant hover:opacity-90 transition-opacity" style="background-image: url('${item.photoUrl}')"></div>
             </div>
           </div>
           <p class="font-body-md text-body-md text-on-surface-variant text-sm">${item.description}</p>
@@ -156,5 +156,18 @@ async function logout() {
     if (res.ok) window.location.href = '/login';
   } catch(e) { console.error(e); }
 }
+
+// Lightbox Logic
+document.body.insertAdjacentHTML('beforeend', `
+  <div id="imageLightbox" class="fixed inset-0 z-[999] bg-black/90 hidden items-center justify-center cursor-zoom-out" onclick="this.classList.replace('flex','hidden')">
+    <img id="lightboxImg" class="max-w-[95%] max-h-[95vh] object-contain rounded" src="" />
+    <button class="absolute top-4 right-4 text-white p-2 bg-black/50 rounded-full hover:bg-black/80"><span class="material-symbols-outlined">close</span></button>
+  </div>
+`);
+window.openLightbox = (src) => {
+  document.getElementById('lightboxImg').src = src;
+  const lb = document.getElementById('imageLightbox');
+  lb.classList.replace('hidden', 'flex');
+};
 </script>
 </body></html>

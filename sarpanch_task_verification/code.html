@@ -110,15 +110,19 @@
                   <div class="flex items-start gap-2 mb-4 text-primary">
                     <span class="material-symbols-outlined mt-0.5">location_on</span>
                     <div>
-                      <p class="font-label-bold text-label-bold">${item.location}</p>
-                      <p class="font-body-md text-[14px] text-on-surface-variant">GPS: ${item.gps}</p>
+                      <p class="font-label-bold text-label-bold"><a href="https://www.google.com/maps?q=${item.lat},${item.lon}" target="_blank" class="text-primary underline hover:opacity-80">${item.location}</a></p>
+                      <p class="font-body-md text-[14px] text-on-surface-variant">GPS: ${item.lat}, ${item.lon}</p>
                     </div>
                   </div>
                   <p class="font-body-md text-body-md text-on-surface mb-4">${item.description}</p>
-                  <img class="w-full h-48 object-cover rounded border border-outline-variant mb-6" src="${item.photoUrl}" />
+                  <img onclick="openLightbox(this.src)" class="cursor-pointer w-full h-48 object-cover rounded border border-outline-variant mb-6 hover:opacity-90 transition-opacity" src="${item.photoUrl}" title="Click to view full image" />
                   <button onclick="resolveTask(${item.id})" class="w-full py-4 bg-primary text-white font-label-bold text-label-bold rounded flex items-center justify-center gap-2 active:bg-primary/90">
                     <span class="material-symbols-outlined">check_circle</span>
                     Mark as Resolved
+                  </button>
+                  <button onclick="deleteTask(${item.id})" class="w-full mt-2 py-4 bg-error text-white font-label-bold text-label-bold rounded flex items-center justify-center gap-2 active:bg-error/90" style="display: ${window.userRole === 'Admin' ? 'flex' : 'none'};">
+                    <span class="material-symbols-outlined">delete</span>
+                    Delete Report (Admin)
                   </button>
                 </div>
               </div>
@@ -145,7 +149,11 @@
                 </div>
                 <div class="p-4">
                   <p class="font-body-md text-body-md text-on-surface mb-4">${item.description}</p>
-                  <img class="w-full h-32 object-cover rounded border border-outline-variant grayscale" src="${item.photoUrl}" />
+                  <img onclick="openLightbox(this.src)" class="cursor-pointer w-full h-32 object-cover rounded border border-outline-variant grayscale hover:grayscale-0 transition-all" src="${item.photoUrl}" title="Click to view full image" />
+                  <button onclick="deleteTask(${item.id})" class="w-full mt-4 py-3 bg-error text-white font-label-bold text-label-bold rounded flex items-center justify-center gap-2 active:bg-error/90" style="display: ${window.userRole === 'Admin' ? 'flex' : 'none'};">
+                    <span class="material-symbols-outlined">delete</span>
+                    Delete Report (Admin)
+                  </button>
                 </div>
               </div>
             `;
@@ -195,6 +203,21 @@
       fileInput.click();
     }
 
+    async function deleteTask(id) {
+      if (!confirm("Are you sure you want to completely delete this report? This cannot be undone.")) return;
+      try {
+        const res = await fetch(`/api/issues/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          alert("Report deleted!");
+          loadTasks();
+        } else {
+          alert("Failed to delete report.");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     async function verifyAuth() {
       try {
         const authRes = await fetch('/api/auth/status');
@@ -204,6 +227,7 @@
           return;
         }
         const role = authData.user.role;
+        window.userRole = role;
         if (role !== 'Admin' && role !== 'Sarpanch') {
           alert("Access Denied: Only Sarpanch and Admin can access task verifications.");
           window.location.href = '/home';
@@ -236,14 +260,27 @@
     }
     verifyAuth();
 
-async function logout() {
-  if (!confirm("Are you sure you want to logout?")) return;
-  try {
-    const res = await fetch('/api/auth/logout', { method: 'POST' });
-    if (res.ok) window.location.href = '/login';
-  } catch(e) { console.error(e); }
-}
-</script>
+    async function logout() {
+      if (!confirm("Are you sure you want to logout?")) return;
+      try {
+        const res = await fetch('/api/auth/logout', { method: 'POST' });
+        if (res.ok) window.location.href = '/login';
+      } catch(e) { console.error(e); }
+    }
+
+    // Lightbox Logic
+    document.body.insertAdjacentHTML('beforeend', `
+      <div id="imageLightbox" class="fixed inset-0 z-[999] bg-black/90 hidden items-center justify-center cursor-zoom-out" onclick="this.classList.replace('flex','hidden')">
+        <img id="lightboxImg" class="max-w-[95%] max-h-[95vh] object-contain rounded" src="" />
+        <button class="absolute top-4 right-4 text-white p-2 bg-black/50 rounded-full hover:bg-black/80"><span class="material-symbols-outlined">close</span></button>
+      </div>
+    `);
+    window.openLightbox = (src) => {
+      document.getElementById('lightboxImg').src = src;
+      const lb = document.getElementById('imageLightbox');
+      lb.classList.replace('hidden', 'flex');
+    };
+  </script>
 </main>
 <nav class="fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-xl pb-safe shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary font-bold">
 <div class="flex justify-between items-center h-16 px-gutter">
