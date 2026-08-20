@@ -14,6 +14,15 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 // Load environment variables
 dotenv.config();
 
+// --- JUGAAD: Prevent server from crashing on errors ---
+process.on('uncaughtException', function (err) {
+  console.error('Caught exception: ', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+// ------------------------------------------------------
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -466,11 +475,12 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
-// ── Cron Job to prevent server from sleeping ───────────────────────
 const cron = require('node-cron');
-cron.schedule('*/14 * * * *', () => {
+const https = require('https');
+cron.schedule('*/1 * * * *', () => {
   const url = process.env.SERVER_URL || `http://localhost:${PORT}`;
-  http.get(url, (res) => {
+  const getModule = url.startsWith('https') ? https : http;
+  getModule.get(url, (res) => {
     console.log(`Self-ping status: ${res.statusCode}`);
   }).on('error', (err) => {
     console.error(`Self-ping failed: ${err.message}`);
