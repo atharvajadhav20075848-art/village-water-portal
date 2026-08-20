@@ -478,10 +478,13 @@ app.listen(PORT, '0.0.0.0', () => {
 const cron = require('node-cron');
 const https = require('https');
 cron.schedule('*/1 * * * *', () => {
-  const url = process.env.SERVER_URL || `http://localhost:${PORT}`;
+  const baseUrl = process.env.SERVER_URL ? process.env.SERVER_URL.replace(/\/$/, '') : `http://localhost:${PORT}`;
+  const url = `${baseUrl}/api/auth/status`;
   const getModule = url.startsWith('https') ? https : http;
+  
   getModule.get(url, (res) => {
     console.log(`Self-ping status: ${res.statusCode}`);
+    res.resume(); // Consume response data to free up memory
   }).on('error', (err) => {
     console.error(`Self-ping failed: ${err.message}`);
   });
