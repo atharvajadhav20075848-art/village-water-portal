@@ -72,13 +72,17 @@ document.getElementById('manualLoginForm').addEventListener('submit', async (e) 
   let lon = null;
   try {
     const position = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000, maximumAge: 0 });
     });
     lat = position.coords.latitude;
     lon = position.coords.longitude;
   } catch (err) {
-    console.warn("Geolocation denied or unavailable.", err);
-    alert("Location access was blocked by your browser! We will use a rough network estimate (which might show the wrong state). To fix this, click the Lock/Site Settings icon next to the URL and Allow Location.");
+    console.warn("Geolocation issue.", err);
+    if (err.code === 1) {
+      alert("Location access was blocked by your browser! We will use a rough network estimate. To fix this, Allow Location in site settings.");
+    } else {
+      console.log("Could not get precise location (timeout/unavailable). Using fallback.");
+    }
   }
 
   try {
@@ -106,13 +110,17 @@ async function handleCredentialResponse(response) {
 
   try {
     const position = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000, maximumAge: 0 });
     });
     lat = position.coords.latitude;
     lon = position.coords.longitude;
   } catch (err) {
-    console.warn("Geolocation denied or unavailable.", err);
-    alert("Location access was blocked by your browser! We will use a rough network estimate (which might show the wrong state). To fix this, click the Lock/Site Settings icon next to the URL and Allow Location.");
+    console.warn("Geolocation issue.", err);
+    if (err.code === 1) {
+      alert("Location access was blocked by your browser! We will use a rough network estimate. To fix this, Allow Location in site settings.");
+    } else {
+      console.log("Could not get precise location (timeout/unavailable). Using fallback.");
+    }
   }
 
   try {
