@@ -1,0 +1,178 @@
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@600;700&amp;family=Atkinson+Hyperlegible+Next:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-fixed": "#cbe6ff", "surface-container-high": "#ffe3cd", "primary-container": "#1a5276", "secondary": "#006b58", "on-tertiary-fixed": "#351000", "on-primary-fixed": "#001e30", "on-tertiary-fixed-variant": "#7b2f00", "background": "#fff8f5", "secondary-fixed": "#99f4da", "on-secondary": "#ffffff", "surface-container-low": "#fff1e8", "on-surface": "#2c1602", "primary-fixed-dim": "#9bccf6", "outline": "#72787f", "secondary-fixed-dim": "#7dd7be", "on-tertiary": "#ffffff", "inverse-on-surface": "#ffeee1", "on-secondary-fixed": "#002019", "tertiary-container": "#873400", "surface-container-lowest": "#ffffff", "surface-tint": "#2f6388", "inverse-primary": "#9bccf6", "on-primary-fixed-variant": "#0e4b6e", "surface-variant": "#ffdcbf", "on-primary": "#ffffff", "surface-dim": "#fdd2ae", "tertiary-fixed-dim": "#ffb695", "surface-container-highest": "#ffdcbf", "error-container": "#ffdad6", "on-tertiary-container": "#ffac86", "on-error": "#ffffff", "outline-variant": "#c1c7cf", "primary": "#003b5a", "surface": "#fff8f5", "error": "#ba1a1a", "surface-container": "#ffeadb", "on-error-container": "#93000a", "surface-bright": "#fff8f5", "on-surface-variant": "#41474e", "secondary-container": "#99f4da", "on-background": "#2c1602", "inverse-surface": "#442b12", "tertiary": "#622400", "tertiary-fixed": "#ffdbcc", "on-secondary-fixed-variant": "#005142", "on-secondary-container": "#00725d", "on-primary-container": "#94c5ee" }, "spacing": { "md": "16px", "sm": "8px", "container-margin": "20px", "lg": "24px", "xl": "40px", "xs": "4px", "unit": "4px", "touch-target": "48px", "gutter": "16px" }, "fontFamily": { "label-bold": ["Public Sans"], "body-lg": ["Atkinson Hyperlegible Next"], "status-badge": ["Public Sans"], "headline-lg": ["Public Sans"], "body-md": ["Atkinson Hyperlegible Next"], "headline-lg-mobile": ["Public Sans"], "headline-md": ["Public Sans"] }, "fontSize": { "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}], "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}], "status-badge": ["13px", {"lineHeight": "16px", "fontWeight": "600"}], "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}], "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}], "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}], "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}] } } } }</script><style>@layer base { .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } body { -webkit-tap-highlight-color: transparent; } } </style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface font-body-md"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-margin flex items-center justify-between"><div class="flex items-center gap-sm"><img alt="Village Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI2oc_Spp8I6sgWaFMdsSaFj6HCk6B0FcQPjuW5ESxOxg1qEkS2UujcZNWktzJc8s5jwVXxfZcpXC-_nT7qoyZfCico0MZXOysuOfdYGH_BObereTalqbra5mCuW0jZ4k0JiWCqJUizNUxZ0eoHab6alVwGgUk4JVZXPKdivAOY5RPtWQVl8LjrPw0-RknTkFttseIwCfgur0EmzMkWGVWB07KHOChoA5J8VhKNoq1A7a7uu-LpA0X4w"/><span class="font-headline-md text-headline-md text-primary">Home</span></div><div class="flex items-center gap-xs"><button onclick="logout()" class="text-[11px] text-error font-label-bold uppercase hover:underline mr-2 py-1 px-2 border border-error rounded-full">Logout</button><img alt="Profile" class="w-8 h-8 rounded-full object-cover border-2 border-primary-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9xl8M-8NUe2E-4TJUhfwoMlXWQVlOo8FbTAZqNrSnRR9n-xWoRkdxOiZ0gYvn2EEz2gdPSVbHCoVyu5cvyDyfJKN4I5NOsjR-sZIEUPPEf4W2S016llIQ4HI7CYcPFTdXF0ToDf0kE95ABGN3kxKHHAmi_4iHRaeqsgRVmU8YmfpghDR-hApGUFwoNvXr5ALTMF3F-s3NV42JV1UDqwfKhb8lpovhvJKnIQN5IGMG0dGHvu5LzFvSNQ"/></div></div></header><main class="relative w-full pt-16 pb-24 bg-surface"><div class="flex flex-col w-full gap-xl">
+<section class="px-container-margin">
+<div class="bg-primary text-on-primary p-lg rounded-xl flex items-center justify-between">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile mb-xs">Village Success</h2>
+<p class="font-body-md text-body-md text-primary-fixed">Together we keep our water flowing.</p>
+</div>
+<span class="material-symbols-outlined text-[48px] text-secondary-fixed">water_drop</span>
+</div>
+</section>
+<section class="px-container-margin">
+<h3 class="font-headline-md text-headline-md text-primary mb-md">How It Works</h3>
+<div class="bg-surface-container text-on-surface p-lg rounded-xl">
+<div class="flex flex-col gap-lg">
+<div class="flex items-start gap-md relative">
+<div class="w-[2px] bg-secondary-fixed absolute left-6 top-10 bottom-[-24px] z-0"></div>
+<div class="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-headline-md z-10 shrink-0 border-2 border-surface-container">1</div>
+<div class="pt-2">
+<h4 class="font-label-bold text-label-bold text-primary mb-xs uppercase tracking-wider">Report</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">See a leak or broken pump? Take a photo and tell us where it is.</p>
+</div>
+</div>
+<div class="flex items-start gap-md relative">
+<div class="w-[2px] bg-secondary-fixed absolute left-6 top-10 bottom-[-24px] z-0"></div>
+<div class="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-headline-md z-10 shrink-0 border-2 border-surface-container">2</div>
+<div class="pt-2">
+<h4 class="font-label-bold text-label-bold text-primary mb-xs uppercase tracking-wider">Verify</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">The village council checks the report and assigns a technician.</p>
+</div>
+</div>
+<div class="flex items-start gap-md">
+<div class="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-headline-md z-10 shrink-0 border-2 border-surface-container">3</div>
+<div class="pt-2">
+<h4 class="font-label-bold text-label-bold text-primary mb-xs uppercase tracking-wider">Fix</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">The problem is repaired and everyone is updated.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="px-container-margin">
+<div class="flex items-center justify-between mb-md">
+<h3 class="font-headline-md text-headline-md text-primary">Recent Fixes</h3>
+<a class="font-label-bold text-label-bold text-secondary uppercase tracking-wider" href="#">View All</a>
+</div>
+<div id="recent-fixes-container" class="flex flex-col gap-md">
+  <!-- Dynamic Fixes Populate Here -->
+</div>
+</section>
+<div class="px-container-margin mt-md">
+<button onclick="window.location.href='/report'" class="w-full min-h-[56px] bg-primary text-on-primary font-label-bold text-label-bold uppercase tracking-wider rounded-none flex items-center justify-center gap-sm active:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined">add_a_photo</span>
+      Report a New Issue
+    </button>
+</div>
+</div></main>
+<nav class="fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-xl pb-safe shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary font-bold">
+<div class="flex justify-between items-center h-16 px-gutter">
+<a aria-current="page" class="flex flex-col items-center justify-center min-w-[64px] transition-colors text-primary font-bold" data-path="home" href="/home"><span class="material-symbols-outlined">home</span><span class="font-label-bold text-[10px] uppercase tracking-wider">Home</span></a>
+<a class="flex flex-col items-center justify-center min-w-[64px] text-on-surface-variant transition-colors" data-path="report" href="/report"><span class="material-symbols-outlined">report_problem</span><span class="font-label-bold text-[10px] uppercase tracking-wider">Report</span></a>
+<a class="flex flex-col items-center justify-center min-w-[64px] text-on-surface-variant transition-colors" data-path="tasks" href="/tasks"><span class="material-symbols-outlined">assignment_turned_in</span><span class="font-label-bold text-[10px] uppercase tracking-wider">Tasks</span></a>
+<a class="flex flex-col items-center justify-center min-w-[64px] text-on-surface-variant transition-colors" data-path="admin" href="/admin"><span class="material-symbols-outlined">monitoring</span><span class="font-label-bold text-[10px] uppercase tracking-wider">Admin</span></a>
+<a class="flex flex-col items-center justify-center min-w-[64px] text-on-surface-variant transition-colors" data-path="support" href="/support"><span class="material-symbols-outlined">mail</span><span class="font-label-bold text-[10px] uppercase tracking-wider">Support</span></a>
+</div>
+</nav>
+<script>
+async function checkAuthAndLoad() {
+  try {
+    const authRes = await fetch('/api/auth/status');
+    const authData = await authRes.json();
+    if (!authData.loggedIn) {
+      window.location.href = '/login';
+      return;
+    }
+    
+    const role = authData.user.role;
+    const homeLink = document.querySelector('[data-path="home"]');
+    const reportLink = document.querySelector('[data-path="report"]');
+    const tasksLink = document.querySelector('[data-path="tasks"]');
+    const adminLink = document.querySelector('[data-path="admin"]');
+    const supportLink = document.querySelector('[data-path="support"]');
+
+    if (role === 'People/User') {
+      if (homeLink) homeLink.style.display = 'flex';
+      if (reportLink) reportLink.style.display = 'flex';
+      if (tasksLink) tasksLink.style.display = 'none';
+      if (adminLink) adminLink.style.display = 'none';
+      if (supportLink) supportLink.style.display = 'flex';
+    } else if (role === 'Sarpanch') {
+      if (homeLink) homeLink.style.display = 'flex';
+      if (reportLink) reportLink.style.display = 'flex';
+      if (tasksLink) tasksLink.style.display = 'flex';
+      if (adminLink) adminLink.style.display = 'none';
+      if (supportLink) supportLink.style.display = 'flex';
+    } else if (role === 'Admin') {
+      if (homeLink) homeLink.style.display = 'flex';
+      if (reportLink) reportLink.style.display = 'flex';
+      if (tasksLink) tasksLink.style.display = 'flex';
+      if (adminLink) adminLink.style.display = 'flex';
+      if (supportLink) supportLink.style.display = 'flex';
+    }
+
+    // Load dynamic issues
+    const res = await fetch('/api/issues');
+    const issues = await res.json();
+    const solved = issues.filter(i => i.status === 'Resolved');
+    const container = document.getElementById('recent-fixes-container');
+    container.innerHTML = '';
+    
+    if (solved.length === 0) {
+      container.innerHTML = '<p class="text-sm text-on-surface-variant italic">No solved issues to display.</p>';
+      return;
+    }
+
+    solved.forEach(item => {
+      container.innerHTML += `
+        <article class="bg-surface-container-lowest border border-outline-variant p-md">
+          <div class="flex justify-between items-start mb-md">
+            <div>
+              <h4 class="font-headline-md text-headline-md text-on-surface mb-xs">${item.title}</h4>
+              <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs">
+                <span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
+                <a href="https://www.google.com/maps?q=${item.lat},${item.lon}" target="_blank" class="text-primary underline hover:opacity-80">${item.location}</a>
+              </p>
+            </div>
+            <div class="bg-secondary text-on-secondary px-sm py-xs flex items-center gap-xs rounded-sm">
+              <span class="material-symbols-outlined text-[14px]">check_circle</span>
+              <span class="font-status-badge text-status-badge uppercase tracking-wider">Solved</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-sm mb-md">
+            <div class="relative cursor-pointer group" onclick="openLightbox('${item.photoUrl}')" title="Click to view original issue image">
+              <div class="absolute top-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider z-10">Before</div>
+              <div class="w-full h-48 bg-cover bg-center border border-outline-variant group-hover:opacity-90 transition-opacity" style="background-image: url('${item.photoUrl}')"></div>
+            </div>
+            <div class="relative cursor-pointer group" onclick="openLightbox('${item.resolutionPhotoUrl || item.photoUrl}')" title="Click to view resolved image">
+              <div class="absolute top-2 left-2 bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider z-10">After</div>
+              <div class="w-full h-48 bg-cover bg-center border border-outline-variant group-hover:opacity-90 transition-opacity" style="background-image: url('${item.resolutionPhotoUrl || item.photoUrl}')"></div>
+            </div>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant text-sm">${item.description}</p>
+        </article>
+      `;
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
+checkAuthAndLoad();
+
+async function logout() {
+  if (!confirm("Are you sure you want to logout?")) return;
+  try {
+    const res = await fetch('/api/auth/logout', { method: 'POST' });
+    if (res.ok) window.location.href = '/login';
+  } catch(e) { console.error(e); }
+}
+
+// Lightbox Logic
+document.body.insertAdjacentHTML('beforeend', `
+  <div id="imageLightbox" class="fixed inset-0 z-[999] bg-black/90 hidden items-center justify-center cursor-zoom-out" onclick="this.classList.replace('flex','hidden')">
+    <img id="lightboxImg" class="max-w-[95%] max-h-[95vh] object-contain rounded" src="" />
+    <button class="absolute top-4 right-4 text-white p-2 bg-black/50 rounded-full hover:bg-black/80"><span class="material-symbols-outlined">close</span></button>
+  </div>
+`);
+window.openLightbox = (src) => {
+  document.getElementById('lightboxImg').src = src;
+  const lb = document.getElementById('imageLightbox');
+  lb.classList.replace('hidden', 'flex');
+};
+</script>
+</body></html>

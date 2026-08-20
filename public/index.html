@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <title>Gram Panchayat Water Management Portal</title>
+  
+  <!-- Fonts: Public Sans for headlines & Atkinson Hyperlegible Next for clean reading -->
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@600;700&family=Atkinson+Hyperlegible+Next:wght@400;600&display=swap" rel="stylesheet"/>
+  <!-- Material Symbols for classic, clean Google-style icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0" rel="stylesheet"/>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            // Earthy, water-centric civic palette
+            primary: "#184e77",        // Deep Slate Blue
+            secondary: "#226f54",      // Traditional Clay Green
+            accent: "#d4a373",         // Warm Sand / Clay Orange
+            background: "#f8f9fa",     // Clean Soft Ivory
+            surface: "#ffffff",        // Crisp White
+            "on-surface": "#212529",   // Charcoal black
+            "on-surface-variant": "#495057",
+            border: "#e9ecef"
+          },
+          fontFamily: {
+            sans: ["'Atkinson Hyperlegible Next'", "sans-serif"],
+            headline: ["'Public Sans'", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    body {
+      background-color: #f8f9fa;
+      color: #212529;
+      font-family: 'Atkinson Hyperlegible Next', sans-serif;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Public Sans', sans-serif;
+    }
+    .nav-active {
+      color: #184e77;
+      font-weight: 700;
+      border-top: 3px solid #184e77;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col pb-16">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white border-b border-gray-200">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- Custom Hand-designed SVG Logo: Traditional Clay Pot & Droplet -->
+        <svg class="h-10 w-10 text-primary" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M50 22C43 35 34 45 34 56C34 65 41 72 50 72C59 72 66 65 66 56C66 45 57 35 50 22Z" fill="currentColor"/>
+          <path d="M38 78C30 78 25 72 25 65" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M62 78C70 78 75 72 75 65" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <span class="font-headline font-bold text-lg text-primary block leading-tight">Gram Panchayat</span>
+          <span class="text-xs text-gray-500 uppercase tracking-widest font-semibold">Water Management</span>
+        </div>
+      </div>
+      
+      <!-- User profile / Login State -->
+      <div id="user-profile-header" class="hidden items-center gap-3">
+        <div class="text-right">
+          <p id="header-user-name" class="font-bold text-sm text-gray-800"></p>
+          <span id="header-user-role" class="text-[10px] bg-primary/10 text-primary font-bold px-2 py-0.5 rounded-full uppercase"></span>
+        </div>
+        <button id="logout-btn" class="text-gray-500 hover:text-red-600 flex items-center justify-center p-1 rounded-full hover:bg-gray-100">
+          <span class="material-symbols-outlined">logout</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Areas -->
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4">
+    
+    <!-- 1. LOGIN SCREEN -->
+    <section id="screen-login" class="hidden max-w-md mx-auto my-12 bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <div class="text-center mb-8">
+        <svg class="h-16 w-16 text-primary mx-auto mb-4" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M50 22C43 35 34 45 34 56C34 65 41 72 50 72C59 72 66 65 66 56C66 45 57 35 50 22Z" fill="currentColor"/>
+        </svg>
+        <h2 class="font-headline font-bold text-2xl text-primary">Village Water Portal</h2>
+        <p class="text-gray-500 text-sm mt-1">Access role-based water management dashboards</p>
+      </div>
+      
+      <div id="login-error-alert" class="hidden mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
+        <p class="font-bold text-sm">Access Denied</p>
+        <p id="login-error-text" class="text-xs mt-1"></p>
+      </div>
+
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1" for="email">Email Address</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-3 text-gray-400">mail</span>
+            <input class="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" id="email" type="email" placeholder="name@village.gov.in" required/>
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1" for="password">Password</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-3 text-gray-400">lock</span>
+            <input class="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" id="password" type="password" placeholder="••••••••" required/>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-primary text-white font-bold uppercase tracking-wider rounded hover:bg-primary/95 transition-colors">
+          Log In
+        </button>
+
+        <div class="relative my-6 flex items-center justify-center">
+          <div class="border-t border-gray-300 w-full"></div>
+          <span class="absolute bg-white px-3 text-xs text-gray-500 uppercase tracking-widest">OR</span>
+        </div>
+
+        <!-- Keep Google Sign-In implementation -->
+        <button type="button" id="google-signin-btn" class="w-full py-3 bg-white border border-gray-300 text-gray-700 font-bold uppercase tracking-wider rounded flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors">
+          <img alt="Google" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjdtfmG6yzWaVhg9-VkkSvbrzBwRfRszabn4-rGTygzFJdAuOc-ZQDHnhTpd20l0LQY0_uqhN7IKCCJXTwnUtHeOk2whCYHSWG7qxhezx3o1ebKMYlREClojcezK7k21oBkBqGDpXCJU4rA4EvZ2bV0pa-8VEiAnxVXerv6UuL3JT8NmbaMhsR6w1FGiCAzqqQWZw2fw2bqIqpIJyoPKY0hwEvAx6xta0M6Td2kqKv1lKQ3ruoAAnXGQ"/>
+          <span>Sign in with Google</span>
+        </button>
+      </form>
+      
+      <p class="text-xs text-gray-500 italic mt-6 text-center">
+        Note: Access is whitelisted. Registered users: admin@village.gov.in (Admin), sarpanch@village.gov.in (Sarpanch), resident@village.gov.in (Resident).
+      </p>
+    </section>
+
+    <!-- 2. HOME SCREEN -->
+    <section id="screen-home" class="hidden space-y-6">
+      <div class="bg-primary text-white p-6 rounded-lg flex items-center justify-between">
+        <div>
+          <h2 class="font-headline font-bold text-2xl">Village Water Conservation</h2>
+          <p class="text-primary-100 text-sm mt-1">Real-time reports, tracking, and water source management.</p>
+        </div>
+        <span class="material-symbols-outlined text-[48px] text-accent">water_drop</span>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="md:col-span-2 space-y-6">
+          <h3 class="font-headline font-bold text-xl text-primary border-b pb-2">Recent Solutions</h3>
+          
+          <div id="home-fixes-list" class="space-y-4">
+            <!-- Dynamically populated resolved issues -->
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="bg-white border border-gray-200 rounded-lg p-5">
+            <h4 class="font-headline font-bold text-lg text-primary mb-3">How it Works</h4>
+            <ol class="space-y-4 text-sm text-gray-600">
+              <li class="flex items-start gap-2">
+                <span class="w-6 h-6 rounded-full bg-secondary text-white flex items-center justify-center shrink-0 text-xs font-bold">1</span>
+                <div>
+                  <p class="font-bold text-gray-800">Submit Report</p>
+                  <p class="text-xs">Upload a photograph and mark the location of the leak/issue.</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-6 h-6 rounded-full bg-secondary text-white flex items-center justify-center shrink-0 text-xs font-bold">2</span>
+                <div>
+                  <p class="font-bold text-gray-800">Verification</p>
+                  <p class="text-xs">The Sarpanch verifies the report and assigns maintenance.</p>
+                </div>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-6 h-6 rounded-full bg-secondary text-white flex items-center justify-center shrink-0 text-xs font-bold">3</span>
+                <div>
+                  <p class="font-bold text-gray-800">Resolved</p>
+                  <p class="text-xs">Technicians repair the water supply, and updates are posted.</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <button onclick="switchScreen('report')" class="w-full py-4 bg-secondary text-white font-bold uppercase rounded flex items-center justify-center gap-2 hover:bg-secondary/95 transition-colors">
+            <span class="material-symbols-outlined">add_a_photo</span>
+            Report a New Issue
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. REPORT SCREEN -->
+    <section id="screen-report" class="hidden max-w-xl mx-auto space-y-6">
+      <div class="border-b pb-4">
+        <h2 class="font-headline font-bold text-2xl text-primary">Report a Water/Civic Issue</h2>
+        <p class="text-gray-500 text-sm">Help the village council locate and fix water leaks and supply failures quickly.</p>
+      </div>
+
+      <form id="report-issue-form" class="space-y-4" enctype="multipart/form-data">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Issue Title</label>
+          <input type="text" id="report-title" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" placeholder="e.g. Pipeline leakage, handpump broken" required />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Issue Type</label>
+          <select id="report-type" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary">
+            <option>Water Related Issue</option>
+            <option>Other Civic Issue</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Description</label>
+          <textarea id="report-description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Provide details on the water loss or public hazard..." required></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Location Details</label>
+            <input type="text" id="report-location" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" placeholder="e.g. Near Panchayat Bhavan" required />
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">GPS Coordinates</label>
+            <input type="text" id="report-gps" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Auto-captured (26.128, 75.341)" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Upload Photo Proof</label>
+          <input type="file" id="report-photo" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
+        </div>
+
+        <button type="submit" class="w-full py-3.5 bg-primary text-white font-bold uppercase tracking-wider rounded hover:bg-primary/95 transition-colors flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined">send</span>
+          Submit Report
+        </button>
+      </form>
+    </section>
+
+    <!-- 4. TASKS SCREEN (Sarpanch / Admin dashboard view) -->
+    <section id="screen-tasks" class="hidden space-y-6">
+      <div class="border-b pb-4 flex justify-between items-center">
+        <div>
+          <h2 class="font-headline font-bold text-2xl text-primary">Manage Water Issues</h2>
+          <p class="text-gray-500 text-sm">Review, coordinate, and mark issues as resolved.</p>
+        </div>
+        <div class="flex bg-gray-100 rounded p-1 border">
+          <button id="task-tab-pending" class="px-4 py-2 text-xs font-bold uppercase bg-white text-primary rounded shadow-sm">Pending</button>
+          <button id="task-tab-solved" class="px-4 py-2 text-xs font-bold uppercase text-gray-600 rounded">Solved</button>
+        </div>
+      </div>
+
+      <div id="tasks-list" class="space-y-4">
+        <!-- Populated via API -->
+      </div>
+    </section>
+
+    <!-- 5. ADMIN SCREEN -->
+    <section id="screen-admin" class="hidden space-y-6">
+      <div class="bg-gray-50 border border-gray-200 p-6 rounded-lg">
+        <h2 class="font-headline font-bold text-2xl text-primary">Live Oversight Dashboard</h2>
+        <p class="text-gray-600 text-sm">Configure whitelisted roles, view live tracking feed, and view village network nodes.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Live Connection & Tracking Feed -->
+        <div class="md:col-span-2 space-y-6">
+          <div class="bg-white border border-gray-200 rounded-lg p-5">
+            <h3 class="font-headline font-bold text-lg text-primary mb-4 flex items-center gap-2">
+              <span class="material-symbols-outlined text-green-600 animate-pulse">sensors</span>
+              Live Connection Feed
+            </h3>
+            
+            <div id="admin-feed-list" class="space-y-3">
+              <!-- Live logins & reports list -->
+            </div>
+          </div>
+          
+          <!-- Stylized map with image -->
+          <div class="bg-white border border-gray-200 rounded-lg p-5">
+            <h3 class="font-headline font-bold text-lg text-primary mb-4">Village Network Map</h3>
+            <div class="relative h-64 bg-gray-900 rounded overflow-hidden flex items-center justify-center">
+              <img alt="Village Map" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-luminosity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtpYsncGBwGHHNJEoPjiOCfXVO5KSpQBExEfJKNWsNtn7cqF_GE7fZhbg8ofI-ucqsGKu0Nfo8pODOR_DNpx20VUqrlQMcMnfA8nH8tvc56_4P_1fgpjCixxwPMEJ4Y9mxrFEOBHXzJnvtKCiLG4XALVbKkI0w5kp3jXTgM0haSh0Q9teNfIiGvCEnAvon-kBIaPopmZQhcs-heoCN3f1Q9Vg8YTO0JQ64c2ViuHgiuSrdplT58RtnJg">
+              <!-- Glow points -->
+              <div class="absolute top-[30%] left-[20%] h-3.5 w-3.5 rounded-full bg-green-500 border border-white animate-ping"></div>
+              <div class="absolute top-[60%] left-[45%] h-3.5 w-3.5 rounded-full bg-green-500 border border-white"></div>
+              <div class="absolute top-[40%] right-[30%] h-3.5 w-3.5 rounded-full bg-green-500 border border-white"></div>
+              
+              <div class="absolute bottom-2 left-2 bg-white/90 px-3 py-1.5 rounded text-xs font-bold text-gray-800">
+                Active Nodes: 3 Connections
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Role Configuration Panel -->
+        <div class="space-y-6">
+          <div class="bg-white border border-gray-200 rounded-lg p-5">
+            <h3 class="font-headline font-bold text-lg text-primary mb-4">Allowed Roles Whitelist</h3>
+            
+            <form id="admin-whitelist-form" class="space-y-3 mb-6">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Email Address</label>
+                <input type="email" id="whitelist-email" class="w-full px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary text-sm" placeholder="name@village.gov.in" required />
+              </div>
+              
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1">Assign Role</label>
+                <select id="whitelist-role" class="w-full px-3 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary text-sm">
+                  <option>Admin</option>
+                  <option>Sarpanch</option>
+                  <option>People/User</option>
+                </select>
+              </div>
+
+              <button type="submit" class="w-full py-2 bg-primary text-white text-sm font-bold uppercase rounded hover:bg-primary/95 transition-colors">
+                Add Whitelist
+              </button>
+            </form>
+
+            <div class="border-t pt-4">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Registered Accounts</h4>
+              <div id="admin-roles-list" class="space-y-2 divide-y divide-gray-100 max-h-60 overflow-y-auto">
+                <!-- Whitelist records populate here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. SUPPORT SCREEN -->
+    <section id="screen-support" class="hidden max-w-xl mx-auto space-y-6">
+      <div class="text-center py-6">
+        <span class="material-symbols-outlined text-5xl text-primary bg-primary/10 p-4 rounded-full">support_agent</span>
+        <h2 class="font-headline font-bold text-2xl text-primary mt-4">Need Assistance?</h2>
+        <p class="text-gray-500 text-sm">Connect with the Gram Panchayat administrative support group</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <a href="mailto:support@village.gov.in" class="p-4 border border-gray-200 rounded-lg text-center hover:bg-gray-50 transition-colors">
+          <span class="material-symbols-outlined text-primary text-3xl">mail</span>
+          <p class="font-bold text-sm mt-2">Email Support</p>
+          <p class="text-xs text-gray-500">support@village.gov.in</p>
+        </a>
+        <a href="tel:555-0199" class="p-4 border border-gray-200 rounded-lg text-center hover:bg-gray-50 transition-colors">
+          <span class="material-symbols-outlined text-primary text-3xl">call</span>
+          <p class="font-bold text-sm mt-2">Helpline Number</p>
+          <p class="text-xs text-gray-500">555-0199 (Mon-Sat)</p>
+        </a>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-lg p-5">
+        <h3 class="font-headline font-bold text-lg text-primary mb-3">Frequently Asked Questions</h3>
+        <div class="space-y-4 divide-y divide-gray-100">
+          <div class="pt-3">
+            <p class="font-bold text-gray-800 text-sm">How do I report a water leak?</p>
+            <p class="text-xs text-gray-600 mt-1">Navigate to the "Report" screen from the bottom menu, attach photo evidence, add description details, and submit.</p>
+          </div>
+          <div class="pt-3">
+            <p class="font-bold text-gray-800 text-sm">Who has access to the Sarpanch task view?</p>
+            <p class="text-xs text-gray-600 mt-1">Only whitelisted emails mapped to the "Sarpanch" or "Admin" roles can view and mark issues as resolved.</p>
+          </div>
+          <div class="pt-3">
+            <p class="font-bold text-gray-800 text-sm">How long does water system repairs take?</p>
+            <p class="text-xs text-gray-600 mt-1">Critical system pipeline leakages are addressed immediately. Public handpump welder repairs usually take 1-3 days.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Navigation Menu -->
+  <nav id="bottom-nav" class="hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+    <div class="max-w-6xl mx-auto flex items-center justify-around h-16">
+      <button onclick="switchScreen('home')" class="nav-btn flex-1 flex flex-col items-center justify-center text-gray-500 py-1" data-screen="home">
+        <span class="material-symbols-outlined">home</span>
+        <span class="text-[10px] uppercase font-bold tracking-wider">Home</span>
+      </button>
+      <button onclick="switchScreen('report')" class="nav-btn flex-1 flex flex-col items-center justify-center text-gray-500 py-1" data-screen="report">
+        <span class="material-symbols-outlined">report_problem</span>
+        <span class="text-[10px] uppercase font-bold tracking-wider">Report</span>
+      </button>
+      <button id="nav-btn-tasks" onclick="switchScreen('tasks')" class="nav-btn flex-1 flex flex-col items-center justify-center text-gray-500 py-1" data-screen="tasks">
+        <span class="material-symbols-outlined">assignment_turned_in</span>
+        <span class="text-[10px] uppercase font-bold tracking-wider">Tasks</span>
+      </button>
+      <button id="nav-btn-admin" onclick="switchScreen('admin')" class="nav-btn flex-1 flex flex-col items-center justify-center text-gray-500 py-1" data-screen="admin">
+        <span class="material-symbols-outlined">monitoring</span>
+        <span class="text-[10px] uppercase font-bold tracking-wider">Admin</span>
+      </button>
+      <button onclick="switchScreen('support')" class="nav-btn flex-1 flex flex-col items-center justify-center text-gray-500 py-1" data-screen="support">
+        <span class="material-symbols-outlined">mail</span>
+        <span class="text-[10px] uppercase font-bold tracking-wider">Support</span>
+      </button>
+    </div>
+  </nav>
+
+  <script>
+    let currentUser = null;
+    let currentTaskTab = "pending";
+
+    // Setup initial coordinates for submission
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        document.getElementById('report-gps').value = `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+      }, err => {
+        document.getElementById('report-gps').value = "26.1288, 75.3412"; // Default fallback
+      });
+    } else {
+      document.getElementById('report-gps').value = "26.1288, 75.3412";
+    }
+
+    // Screen navigation helper
+    function switchScreen(screenId) {
+      if (!currentUser && screenId !== 'login') {
+        switchScreen('login');
+        return;
+      }
+
+      // Hide all screens
+      document.querySelectorAll('main > section').forEach(sect => sect.classList.add('hidden'));
+      // Show selected screen
+      const target = document.getElementById(`screen-${screenId}`);
+      if (target) target.classList.remove('hidden');
+
+      // Update Nav highlighting
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-primary', 'font-bold', 'border-t-2', 'border-primary');
+        btn.classList.add('text-gray-500');
+        if (btn.getAttribute('data-screen') === screenId) {
+          btn.classList.add('text-primary', 'font-bold', 'border-t-2', 'border-primary');
+          btn.classList.remove('text-gray-500');
+        }
+      });
+
+      // Load specific screen resources
+      if (screenId === 'home') {
+        loadIssues();
+      } else if (screenId === 'tasks') {
+        loadIssues();
+      } else if (screenId === 'admin') {
+        loadAdminData();
+      }
+    }
+
+    // Fetch and authenticate user session status
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/auth/status');
+        const data = await res.json();
+        if (data.loggedIn) {
+          currentUser = data.user;
+          setupUserInterface();
+          switchScreen('home');
+        } else {
+          currentUser = null;
+          document.getElementById('user-profile-header').classList.add('hidden');
+          document.getElementById('bottom-nav').classList.add('hidden');
+          switchScreen('login');
+        }
+      } catch (err) {
+        console.error('Auth verification failed', err);
+      }
+    }
+
+    // Display appropriate navigation elements depending on user role
+    function setupUserInterface() {
+      document.getElementById('user-profile-header').classList.remove('hidden');
+      document.getElementById('bottom-nav').classList.remove('hidden');
+      document.getElementById('header-user-name').textContent = currentUser.name;
+      document.getElementById('header-user-role').textContent = currentUser.role;
+
+      // Conditional menu view protection
+      const adminNav = document.getElementById('nav-btn-admin');
+      const tasksNav = document.getElementById('nav-btn-tasks');
+
+      if (currentUser.role === 'Admin') {
+        adminNav.style.display = 'flex';
+        tasksNav.style.display = 'flex';
+      } else if (currentUser.role === 'Sarpanch') {
+        adminNav.style.display = 'none';
+        tasksNav.style.display = 'flex';
+      } else {
+        adminNav.style.display = 'none';
+        tasksNav.style.display = 'none';
+      }
+    }
+
+    // Auth actions
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value; // In dynamic app, password checked on server
+      
+      const alertBox = document.getElementById('login-error-alert');
+      alertBox.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        
+        if (!res.ok) {
+          const errData = await res.json();
+          document.getElementById('login-error-text').textContent = errData.message || 'Access Denied.';
+          alertBox.classList.remove('hidden');
+          return;
+        }
+
+        const data = await res.json();
+        currentUser = data.user;
+        setupUserInterface();
+        switchScreen('home');
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    document.getElementById('google-signin-btn').addEventListener('click', async () => {
+      // Simulate Google Sign-In with a prompt whitelisting verify
+      const email = prompt("Enter Google Account email:");
+      if (!email) return;
+
+      const alertBox = document.getElementById('login-error-alert');
+      alertBox.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        
+        if (!res.ok) {
+          const errData = await res.json();
+          alert(errData.message || 'Email not Whitelisted.');
+          return;
+        }
+
+        const data = await res.json();
+        currentUser = data.user;
+        setupUserInterface();
+        switchScreen('home');
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      currentUser = null;
+      checkAuth();
+    });
+
+    // Load and render issues
+    async function loadIssues() {
+      try {
+        const res = await fetch('/api/issues');
+        const issues = await res.json();
+        
+        // Populate Solved list for Home
+        const homeList = document.getElementById('home-fixes-list');
+        const solvedIssues = issues.filter(i => i.status === 'solved');
+        homeList.innerHTML = '';
+        if (solvedIssues.length === 0) {
+          homeList.innerHTML = '<p class="text-sm text-gray-500 italic">No resolved solutions posted yet.</p>';
+        } else {
+          solvedIssues.forEach(issue => {
+            homeList.innerHTML += `
+              <article class="bg-white border border-gray-200 rounded-lg p-4 flex gap-4">
+                <div class="flex flex-col gap-2 w-24">
+                  <div class="relative group cursor-pointer" onclick="openLightbox('${issue.photoUrl}')">
+                    <div class="absolute top-1 left-1 bg-black/60 text-white text-[8px] font-bold px-1 rounded uppercase z-10">Before</div>
+                    <img class="w-24 h-16 object-cover rounded border group-hover:opacity-90" src="${issue.photoUrl}" alt="Before" />
+                  </div>
+                  <div class="relative group cursor-pointer" onclick="openLightbox('${issue.resolutionPhotoUrl || issue.photoUrl}')">
+                    <div class="absolute top-1 left-1 bg-green-600 text-white text-[8px] font-bold px-1 rounded uppercase z-10">After</div>
+                    <img class="w-24 h-16 object-cover rounded border group-hover:opacity-90" src="${issue.resolutionPhotoUrl || issue.photoUrl}" alt="After" />
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-start">
+                    <h4 class="font-headline font-bold text-primary">${issue.title}</h4>
+                    <span class="text-[10px] uppercase bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded">Solved</span>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">location_on</span> ${issue.location}
+                  </p>
+                  <p class="text-sm text-gray-700 mt-2">${issue.description}</p>
+                </div>
+              </article>
+            `;
+          });
+        }
+
+        // Populate Tasks list
+        const tasksList = document.getElementById('tasks-list');
+        const filteredTasks = issues.filter(i => i.status === currentTaskTab);
+        tasksList.innerHTML = '';
+        if (filteredTasks.length === 0) {
+          tasksList.innerHTML = `<p class="text-sm text-gray-500 italic">No ${currentTaskTab} tasks found.</p>`;
+        } else {
+          filteredTasks.forEach(issue => {
+            const dateStr = new Date(issue.dateRaised).toLocaleDateString();
+            const actionBtn = issue.status === 'pending' ? `
+              <button onclick="resolveIssue(${issue.id})" class="mt-4 w-full py-2 bg-primary text-white text-sm font-bold uppercase rounded hover:bg-primary/95 transition-colors">
+                Mark as Resolved
+              </button>
+            ` : '';
+
+            tasksList.innerHTML += `
+              <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div class="bg-gray-50 p-4 border-b flex justify-between items-center">
+                  <div>
+                    <h3 class="font-bold text-gray-800">${issue.title}</h3>
+                    <p class="text-xs text-gray-500">Reported on ${dateStr} by ${issue.reporter}</p>
+                  </div>
+                  <span class="text-xs font-bold px-2 py-1 rounded uppercase ${issue.status === 'pending' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">
+                    ${issue.status}
+                  </span>
+                </div>
+                <div class="p-4 flex flex-col md:flex-row gap-4">
+                  <img class="w-full md:w-48 h-32 object-cover rounded border" src="${issue.photoUrl}" />
+                  <div class="flex-1 flex flex-col justify-between">
+                    <div>
+                      <p class="text-sm text-gray-700">${issue.description}</p>
+                      <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">location_on</span> ${issue.location} (${issue.gps})
+                      </p>
+                    </div>
+                    ${actionBtn}
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Resolve an issue
+    async function resolveIssue(id) {
+      if (!confirm("Are you sure you want to mark this task as resolved?")) return;
+      try {
+        const res = await fetch(`/api/issues/${id}/resolve`, {
+          method: 'POST'
+        });
+        if (res.ok) {
+          loadIssues();
+        } else {
+          const err = await res.json();
+          alert(err.message || 'Failed to resolve issue.');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Submit a new issue
+    document.getElementById('report-issue-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData();
+      formData.append('title', document.getElementById('report-title').value);
+      formData.append('type', document.getElementById('report-type').value);
+      formData.append('description', document.getElementById('report-description').value);
+      formData.append('location', document.getElementById('report-location').value);
+      formData.append('gps', document.getElementById('report-gps').value);
+      
+      const fileInput = document.getElementById('report-photo');
+      if (fileInput.files[0]) {
+        formData.append('photo', fileInput.files[0]);
+      }
+
+      try {
+        const res = await fetch('/api/issues', {
+          method: 'POST',
+          body: formData
+        });
+        if (res.ok) {
+          alert('Issue submitted successfully!');
+          document.getElementById('report-issue-form').reset();
+          switchScreen('home');
+        } else {
+          alert('Failed to submit issue.');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    // Admin Whitelisting & Feed Functions
+    async function loadAdminData() {
+      try {
+        // Fetch Live Activity Feed
+        const feedRes = await fetch('/api/admin/feed');
+        const feedData = await feedRes.json();
+        
+        const feedList = document.getElementById('admin-feed-list');
+        feedList.innerHTML = '';
+        feedData.feed.forEach(item => {
+          feedList.innerHTML += `
+            <div class="flex items-start gap-3 p-2 rounded hover:bg-gray-50">
+              <span class="material-symbols-outlined text-gray-400 mt-1">account_circle</span>
+              <div class="flex-1">
+                <div class="flex justify-between items-baseline">
+                  <h4 class="text-sm font-bold text-gray-800">${item.name}</h4>
+                  <span class="text-[10px] text-gray-400 uppercase">${item.time}</span>
+                </div>
+                <p class="text-xs text-gray-600 mt-0.5">${item.action}</p>
+              </div>
+            </div>
+          `;
+        });
+
+        // Fetch User Roles Whitelist
+        const rolesRes = await fetch('/api/admin/roles');
+        const roles = await rolesRes.json();
+
+        const rolesList = document.getElementById('admin-roles-list');
+        rolesList.innerHTML = '';
+        Object.entries(roles).forEach(([email, role]) => {
+          rolesList.innerHTML += `
+            <div class="flex justify-between items-center py-2">
+              <div>
+                <p class="text-sm font-bold text-gray-800">${email}</p>
+                <span class="text-[10px] text-primary uppercase font-bold">${role}</span>
+              </div>
+              <button onclick="removeWhitelist('${email}')" class="text-xs text-red-500 hover:underline">Remove</button>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Add email to role whitelist
+    document.getElementById('admin-whitelist-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('whitelist-email').value;
+      const role = document.getElementById('whitelist-role').value;
+
+      try {
+        const res = await fetch('/api/admin/roles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, role })
+        });
+        if (res.ok) {
+          document.getElementById('whitelist-email').value = '';
+          loadAdminData();
+        } else {
+          alert('Failed to update roles.');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    // Remove email from whitelist
+    async function removeWhitelist(email) {
+      if (!confirm(`Are you sure you want to remove ${email} access whitelist?`)) return;
+      try {
+        const res = await fetch('/api/admin/roles', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        if (res.ok) {
+          loadAdminData();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Tasks toggles
+    document.getElementById('task-tab-pending').addEventListener('click', () => {
+      currentTaskTab = "pending";
+      document.getElementById('task-tab-pending').className = "px-4 py-2 text-xs font-bold uppercase bg-white text-primary rounded shadow-sm";
+      document.getElementById('task-tab-solved').className = "px-4 py-2 text-xs font-bold uppercase text-gray-600 rounded";
+      loadIssues();
+    });
+
+    document.getElementById('task-tab-solved').addEventListener('click', () => {
+      currentTaskTab = "solved";
+      document.getElementById('task-tab-solved').className = "px-4 py-2 text-xs font-bold uppercase bg-white text-primary rounded shadow-sm";
+      document.getElementById('task-tab-pending').className = "px-4 py-2 text-xs font-bold uppercase text-gray-600 rounded";
+      loadIssues();
+    });
+
+    // Start App Check
+    checkAuth();
+  </script>
+</body>
+</html>
