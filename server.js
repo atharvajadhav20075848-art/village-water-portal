@@ -465,3 +465,14 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+// ── Cron Job to prevent server from sleeping ───────────────────────
+const cron = require('node-cron');
+cron.schedule('*/14 * * * *', () => {
+  const url = process.env.SERVER_URL || `http://localhost:${PORT}`;
+  http.get(url, (res) => {
+    console.log(`Self-ping status: ${res.statusCode}`);
+  }).on('error', (err) => {
+    console.error(`Self-ping failed: ${err.message}`);
+  });
+});
