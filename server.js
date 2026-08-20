@@ -307,6 +307,11 @@ app.get('/api/admin/feed', requireAuth(['Admin']), async (req, res) => {
   const feed = await Feed.find({}, { _id: 0, __v: 0 }).sort({ id: -1 }).limit(50);
   res.json({ totalUsers, activeSessions, activeReports, feed });
 });
+
+app.delete('/api/admin/feed', requireAuth(['Admin']), async (req, res) => {
+  await Feed.deleteMany({});
+  res.json({ success: true });
+});
 app.get('/api/admin/users', requireAuth(['Admin']), async (req, res) => {
   const users = await User.find({}, { _id: 0, __v: 0 });
   res.json(users);
