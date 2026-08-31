@@ -509,60 +509,42 @@ async function resolveTaskApp(id) {
   fileInput.style.display = 'none';
   document.body.appendChild(fileInput);
 
-  fileInput.onchange = async () => {
-    const formData = new FormData();
-    if (fileInput.files && fileInput.files[0]) {
-      formData.append('photo', fileInput.files[0]);
-    }
+  const executeResolve = async (formData) => {
     try {
       const res = await fetch(`/api/issues/${id}/resolve`, { 
         method: 'PUT', 
         headers: { 'x-user-email': encodeURIComponent(userEmail) },
         body: formData 
       });
-      if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
         alert("✅ Task resolved and village notified!");
         loadTasks();
         loadHomeFixes();
         if (window.fetchGlobalNotifications) window.fetchGlobalNotifications();
       } else {
-        const err = await res.json().catch(() => ({}));
-        alert("Failed to resolve task: " + (err.error || "Server error"));
+        alert("Failed to resolve task: " + (data.error || "Server error"));
       }
     } catch(e) { 
       console.error(e); 
       alert("Error resolving task.");
+    } finally {
+      if (fileInput.parentNode) fileInput.parentNode.removeChild(fileInput);
     }
-    finally {
-      document.body.removeChild(fileInput);
+  };
+
+  fileInput.onchange = async () => {
+    const formData = new FormData();
+    if (fileInput.files && fileInput.files[0]) {
+      formData.append('photo', fileInput.files[0]);
     }
+    await executeResolve(formData);
   };
 
   if (confirm("Attach a photo of the completed work to resolve this task?\n\nClick 'OK' to select photo, or 'Cancel' to resolve directly.")) {
     fileInput.click();
   } else {
-    try {
-      const res = await fetch(`/api/issues/${id}/resolve`, { 
-        method: 'PUT', 
-        headers: { 'x-user-email': encodeURIComponent(userEmail) },
-        body: new FormData() 
-      });
-      if (res.ok) {
-        alert("✅ Task resolved and village notified!");
-        loadTasks();
-        loadHomeFixes();
-        if (window.fetchGlobalNotifications) window.fetchGlobalNotifications();
-      } else {
-        const err = await res.json().catch(() => ({}));
-        alert("Failed to resolve task: " + (err.error || "Server error"));
-      }
-    } catch(e) { 
-      console.error(e); 
-      alert("Error resolving task.");
-    }
-    finally {
-      document.body.removeChild(fileInput);
-    }
+    await executeResolve(new FormData());
   }
 }
 

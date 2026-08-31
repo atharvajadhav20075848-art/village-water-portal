@@ -218,8 +218,9 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
   formData.append('description', description);
   formData.append('location', locationName);
   formData.append('gps', gpsCoord);
-  if (photoFile.files[0]) {
-    formData.append('photo', photoFile.files[0]);
+  const photoInput = document.getElementById('photoFile');
+  if (photoInput && photoInput.files && photoInput.files[0]) {
+    formData.append('photo', photoInput.files[0]);
   }
 
   const submitBtn = document.getElementById('submitBtn');
