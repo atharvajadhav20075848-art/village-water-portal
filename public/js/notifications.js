@@ -27,9 +27,22 @@ window.addEventListener('click', unlockAudioContext, { passive: true });
 window.addEventListener('touchstart', unlockAudioContext, { passive: true });
 window.addEventListener('pointerdown', unlockAudioContext, { passive: true });
 
-// ── Web Audio API Siren Generator (Loud & Universal) ──────────────────
+let customSirenAudio = null;
+
+// ── Custom Sound Pack Emergency Siren (Loud & Dual-Layer) ─────────
 function startSirenSound() {
   if (isSirenPlaying) return;
+  isSirenPlaying = true;
+
+  try {
+    if (!customSirenAudio) {
+      customSirenAudio = new Audio('/public/sounds/emergency_siren.wav');
+      customSirenAudio.loop = true;
+    }
+    customSirenAudio.currentTime = 0;
+    customSirenAudio.play().catch(() => {});
+  } catch(e) {}
+
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!sirenAudioContext) {
@@ -43,15 +56,14 @@ function startSirenSound() {
     sirenGain = sirenAudioContext.createGain();
 
     sirenOscillator.type = 'sawtooth';
-    sirenGain.gain.setValueAtTime(0.9, sirenAudioContext.currentTime);
+    sirenGain.gain.setValueAtTime(0.95, sirenAudioContext.currentTime);
 
     sirenOscillator.connect(sirenGain);
     sirenGain.connect(sirenAudioContext.destination);
 
     let isHigh = false;
-    sirenOscillator.frequency.setValueAtTime(600, sirenAudioContext.currentTime);
+    sirenOscillator.frequency.setValueAtTime(650, sirenAudioContext.currentTime);
     sirenOscillator.start();
-    isSirenPlaying = true;
 
     // Vibrate phone initially
     if ('vibrate' in navigator) {
@@ -61,11 +73,10 @@ function startSirenSound() {
     sirenInterval = setInterval(() => {
       if (!isSirenPlaying || !sirenOscillator) return;
       isHigh = !isHigh;
-      const targetFreq = isHigh ? 1100 : 550;
+      const targetFreq = isHigh ? 1350 : 650;
       if (sirenAudioContext && sirenAudioContext.state === 'running') {
-        sirenOscillator.frequency.exponentialRampToValueAtTime(targetFreq, sirenAudioContext.currentTime + 0.3);
+        sirenOscillator.frequency.exponentialRampToValueAtTime(targetFreq, sirenAudioContext.currentTime + 0.35);
       }
-      // Continuous vibration pulse on every pitch cycle
       if ('vibrate' in navigator && isHigh) {
         navigator.vibrate([500, 100, 500]);
       }
@@ -77,6 +88,12 @@ function startSirenSound() {
 
 function stopSirenSound() {
   isSirenPlaying = false;
+  if (customSirenAudio) {
+    try {
+      customSirenAudio.pause();
+      customSirenAudio.currentTime = 0;
+    } catch(e) {}
+  }
   if (sirenInterval) {
     clearInterval(sirenInterval);
     sirenInterval = null;
@@ -99,21 +116,27 @@ function stopSirenSound() {
 
 function playGentleChime() {
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5
-    gain.gain.setValueAtTime(0.4, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.65);
+    const chime = new Audio('/public/sounds/chime.wav');
+    chime.play().catch(() => {});
     if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
-  } catch (e) {}
+  } catch (e) {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.4, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.65);
+      if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+    } catch (e2) {}
+  }
 }
 
 function injectNotificationUI() {
