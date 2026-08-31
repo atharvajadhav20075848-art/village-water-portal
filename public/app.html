@@ -536,7 +536,17 @@ async function resolveTaskApp(id) {
   fileInput.onchange = async () => {
     const formData = new FormData();
     if (fileInput.files && fileInput.files[0]) {
-      formData.append('photo', fileInput.files[0]);
+      const file = fileInput.files[0];
+      formData.append('photo', file);
+      try {
+        const base64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(file);
+        });
+        if (base64) formData.append('photoBase64', base64);
+      } catch(e) {}
     }
     await executeResolve(formData);
   };

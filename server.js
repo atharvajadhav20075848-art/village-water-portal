@@ -176,34 +176,52 @@ async function seedDefaultUsers() {
 }
 mongoose.connection.once('open', seedDefaultUsers);
 
-// ── Cloudinary Image & Audio Upload Setup ────────────────────────────
+// ── Cloudinary Image & Audio Upload Setup (with Instant Base64 Fallback) ──
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "rqltdk0j",
+  api_key: process.env.CLOUDINARY_API_KEY || "456694174673441",
+  api_secret: process.env.CLOUDINARY_API_SECRET || "I4-h0pKuAsiCQtG0e4ZCNylQZzM"
 });
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'village_water_portal',
-    resource_type: 'auto'
-  }
-});
+// Use memory storage so file is always instantly available as a buffer
 const upload = multer({ 
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 25 * 1024 * 1024 }
 });
 
 const uploadSafe = (fieldName) => (req, res, next) => {
   upload.single(fieldName)(req, res, (err) => {
     if (err) {
-      console.warn(`[Multer Warning] ${fieldName} upload fallback:`, err.message);
-      req.file = null;
+      console.warn(`[Multer Notice] ${fieldName}:`, err.message);
     }
     next();
   });
 };
+
+// Fail-safe helper: Uploads to Cloudinary, and if Cloudinary fails, uses Base64 Data URI
+async function uploadToCloudinaryOrBase64(fileBuffer, mimetype, folder = 'village_water_portal') {
+  if (!fileBuffer) return null;
+  return new Promise((resolve) => {
+    try {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder, resource_type: 'auto' },
+        (error, result) => {
+          if (error || !result || !result.secure_url) {
+            console.warn("Cloudinary upload fallback to base64:", error?.message);
+            const base64Data = `data:${mimetype || 'image/jpeg'};base64,${fileBuffer.toString('base64')}`;
+            return resolve(base64Data);
+          }
+          resolve(result.secure_url);
+        }
+      );
+      uploadStream.end(fileBuffer);
+    } catch (e) {
+      console.warn("Cloudinary stream exception, using base64:", e.message);
+      const base64Data = `data:${mimetype || 'image/jpeg'};base64,${fileBuffer.toString('base64')}`;
+      resolve(base64Data);
+    }
+  });
+}
 
 // ── IP Geolocation Helper ──────────────────────────────────────────
 function getLocationFromIP(ip) {
@@ -685,6 +703,17 @@ app.post('/api/issues', uploadSafe('photo'), async (req, res) => {
     ? 'https://res.cloudinary.com/rqltdk0j/image/upload/v1788176415/village_water_portal/s2fwandxq8b3fb9enyoa.jpg'
     : 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&q=80&w=600';
 
+  let finalPhotoUrl = null;
+  if (req.file && req.file.buffer) {
+    finalPhotoUrl = await uploadToCloudinaryOrBase64(req.file.buffer, req.file.mimetype, 'village_water_portal');
+  } else if (req.body.photoBase64 && req.body.photoBase64.startsWith('data:image')) {
+    finalPhotoUrl = req.body.photoBase64;
+  }
+
+  if (!finalPhotoUrl) {
+    finalPhotoUrl = defaultPhoto;
+  }
+
   const newIssue = new Issue({
     id: Date.now(),
     title: title || 'Water Supply Pipeline Leak',
@@ -693,7 +722,7 @@ app.post('/api/issues', uploadSafe('photo'), async (req, res) => {
     location: location || 'Village Area',
     lat: finalLat,
     lon: finalLon,
-    photoUrl: req.file ? req.file.path : defaultPhoto,
+    photoUrl: finalPhotoUrl,
     reporter: userName,
     reporterEmail: userEmail,
     status: 'Pending'
@@ -760,7 +789,14 @@ app.put('/api/issues/:id/resolve', uploadSafe('photo'), async (req, res) => {
   const userEmail = req.session?.user?.email || (req.headers['x-user-email'] ? decodeURIComponent(req.headers['x-user-email']) : null) || 'Sarpanch Office';
   const userRole = req.session?.user?.role || 'Gram Panchayat';
 
-  const resolutionPhoto = req.file ? req.file.path : (existing.photoUrl || 'https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&q=80&w=600');
+  let resolutionPhoto = null;
+  if (req.file && req.file.buffer) {
+    resolutionPhoto = await uploadToCloudinaryOrBase64(req.file.buffer, req.file.mimetype, 'village_water_portal');
+  } else if (req.body.photoBase64 && req.body.photoBase64.startsWith('data:image')) {
+    resolutionPhoto = req.body.photoBase64;
+  } else {
+    resolutionPhoto = existing.photoUrl || 'https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&q=80&w=600';
+  }
 
   const updated = await Issue.findOneAndUpdate(
     { id: issueId },
