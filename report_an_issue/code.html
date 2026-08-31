@@ -222,20 +222,32 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
     formData.append('photo', photoFile.files[0]);
   }
 
+  const submitBtn = document.getElementById('submitBtn');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">progress_activity</span> Submitting...';
+
+  const savedEmail = localStorage.getItem('gram_user_email');
   try {
     const res = await fetch('/api/issues', {
       method: 'POST',
+      headers: savedEmail ? { 'x-user-email': encodeURIComponent(savedEmail) } : {},
       body: formData
     });
-    if (res.ok) {
-      alert("Issue reported successfully!");
+    const result = await res.json();
+    if (res.ok && result.success) {
+      alert("✅ Issue reported successfully!\nPanchayat team has been alerted.");
       window.location.href = '/home';
     } else {
-      alert("Failed to submit issue report.");
+      alert(result.error || "Failed to submit issue report.");
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
     }
   } catch (err) {
     console.error(err);
     alert("Error communicating with server.");
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalText;
   }
 });
 

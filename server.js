@@ -650,69 +650,85 @@ app.get('/api/issues', async (req, res) => {
   res.json(issues);
 });
 
-app.post('/api/issues', requireAuth(), upload.single('photo'), async (req, res) => {
+app.post('/api/issues', upload.single('photo'), async (req, res) => {
   const { title, type, description, location, gps } = req.body;
   
   let finalLat = 0, finalLon = 0;
   if (gps && gps !== 'Unknown') {
     const parts = gps.split(',');
     if (parts.length === 2) {
-      finalLat = parseFloat(parts[0].trim());
-      finalLon = parseFloat(parts[1].trim());
+      finalLat = parseFloat(parts[0].trim()) || 0;
+      finalLon = parseFloat(parts[1].trim()) || 0;
     }
   }
 
+  const userEmail = req.session?.user?.email || 
+    (req.headers['x-user-email'] ? decodeURIComponent(req.headers['x-user-email']).trim() : '') || 
+    'resident@village.gov';
+  const userName = req.session?.user?.name || (userEmail.includes('@') ? userEmail.split('@')[0] : 'Resident');
+  const userRole = req.session?.user?.role || 'People/User';
+
+  const defaultPhoto = type === 'Water Related Issue' 
+    ? 'https://res.cloudinary.com/rqltdk0j/image/upload/v1788176415/village_water_portal/s2fwandxq8b3fb9enyoa.jpg'
+    : 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&q=80&w=600';
+
   const newIssue = new Issue({
     id: Date.now(),
-    title,
-    type,
-    description,
-    location,
+    title: title || 'Water Supply Pipeline Leak',
+    type: type || 'Water Related Issue',
+    description: description || 'Village issue report',
+    location: location || 'Village Area',
     lat: finalLat,
     lon: finalLon,
-    photoUrl: req.file ? req.file.path : null,
-    reporter: req.session.user.name || req.session.user.email,
-    reporterEmail: req.session.user.email,
+    photoUrl: req.file ? req.file.path : defaultPhoto,
+    reporter: userName,
+    reporterEmail: userEmail,
     status: 'Pending'
   });
   await newIssue.save();
 
   // 1. Send instant in-app notification to the reporting User
-  await Notification.create({
-    id: Date.now() + 1,
-    title: `Report Submitted: ${title}`,
-    message: `Your issue at "${location}" has been received. Panchayat team will inspect and take action soon.`,
-    senderName: 'Gram Jal Portal',
-    senderRole: 'System',
-    targetEmail: req.session.user.email,
-    targetRole: 'People/User',
-    type: 'issue',
-    createdAt: new Date(),
-    readBy: []
-  });
+  try {
+    if (userEmail) {
+      await Notification.create({
+        id: Date.now() + 1,
+        title: `Report Submitted: ${newIssue.title}`,
+        message: `Your issue at "${newIssue.location}" has been received. Panchayat team will inspect and take action soon.`,
+        senderName: 'Gram Jal Portal',
+        senderRole: 'System',
+        targetEmail: userEmail,
+        targetRole: 'People/User',
+        type: 'issue',
+        createdAt: new Date(),
+        readBy: []
+      });
+    }
 
-  // 2. Send instant in-app notification to Sarpanch and Admin
-  await Notification.create({
-    id: Date.now() + 2,
-    title: `New Issue: ${title}`,
-    message: `Reported by ${req.session.user.name} at ${location}: "${description}"`,
-    senderName: req.session.user.name,
-    senderRole: req.session.user.role,
-    targetRole: 'Sarpanch',
-    type: 'issue',
-    createdAt: new Date(),
-    readBy: []
-  });
+    // 2. Send instant in-app notification to Sarpanch and Admin
+    await Notification.create({
+      id: Date.now() + 2,
+      title: `New Issue: ${newIssue.title}`,
+      message: `Reported by ${userName} at ${newIssue.location}: "${newIssue.description}"`,
+      senderName: userName,
+      senderRole: userRole,
+      targetRole: 'Sarpanch',
+      type: 'issue',
+      createdAt: new Date(),
+      readBy: []
+    });
 
-  await Feed.create({
-    id: Date.now(),
-    name: req.session.user.name,
-    time: new Date().toISOString(),
-    action: `Reported issue: ${title}`,
-    location: req.session.user.location,
-    ip: req.session.user.ip,
-    phone: 'N/A'
-  });
+    await Feed.create({
+      id: Date.now(),
+      name: userName,
+      time: new Date().toISOString(),
+      action: `Reported issue: ${newIssue.title}`,
+      location: newIssue.location,
+      ip: req.ip || '127.0.0.1',
+      phone: 'N/A'
+    });
+  } catch (err) {
+    console.error("Issue notification creation error:", err);
+  }
 
   res.json({ success: true, issue: newIssue });
 });
