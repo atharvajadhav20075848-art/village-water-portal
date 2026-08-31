@@ -7,6 +7,8 @@ let sirenGain = null;
 let sirenInterval = null;
 let isSirenPlaying = false;
 let handledEmergencyIds = new Set();
+let seenNotificationIds = new Set();
+let isFirstFetch = true;
 
 // ── Web Audio API Siren Generator (Loud & Universal) ──────────────────
 function startSirenSound() {
@@ -22,7 +24,7 @@ function startSirenSound() {
     sirenGain = sirenAudioContext.createGain();
 
     sirenOscillator.type = 'sawtooth';
-    sirenGain.gain.setValueAtTime(0.8, sirenAudioContext.currentTime);
+    sirenGain.gain.setValueAtTime(0.85, sirenAudioContext.currentTime);
 
     sirenOscillator.connect(sirenGain);
     sirenGain.connect(sirenAudioContext.destination);
@@ -35,13 +37,13 @@ function startSirenSound() {
     sirenInterval = setInterval(() => {
       if (!isSirenPlaying || !sirenOscillator) return;
       isHigh = !isHigh;
-      const targetFreq = isHigh ? 980 : 620;
+      const targetFreq = isHigh ? 1000 : 600;
       sirenOscillator.frequency.exponentialRampToValueAtTime(targetFreq, sirenAudioContext.currentTime + 0.35);
     }, 400);
 
     // Vibration on mobile phones
     if ('vibrate' in navigator) {
-      navigator.vibrate([600, 200, 600, 200, 600, 200, 1000]);
+      navigator.vibrate([800, 200, 800, 200, 800, 200, 1200]);
     }
   } catch (e) {
     console.error('Audio siren init error:', e);
@@ -71,6 +73,25 @@ function stopSirenSound() {
   } catch (e) {}
 }
 
+function playGentleChime() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.6);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.65);
+    if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+  } catch (e) {}
+}
+
 function injectNotificationUI() {
   const headerRight = document.querySelector('header .flex.items-center.gap-xs, header .flex.items-center.gap-sm:last-child');
   
@@ -92,9 +113,33 @@ function injectNotificationUI() {
     headerRight.insertBefore(bellBtn, headerRight.firstChild);
   }
 
-  // Inject Drawer Modal & Emergency Siren Modal if not present
+  // Request browser push notification permission if available
+  if ('Notification' in window && Notification.permission === 'default') {
+    setTimeout(() => {
+      Notification.requestPermission();
+    }, 2000);
+  }
+
+  // Inject Drawer Modal & Emergency Siren Modal & Toast Banner if not present
   if (!document.getElementById('globalNotifModal')) {
     const modalHtml = `
+      <!-- Live Dropdown Toast Banner on Screen -->
+      <div id="liveToastBanner" style="display: none;" class="fixed top-4 left-1/2 -translate-x-1/2 z-[12000] w-[92%] max-w-md bg-surface-container-lowest border-2 border-primary shadow-2xl rounded-2xl p-4 flex items-start gap-3 cursor-pointer animate-in fade-in slide-in-from-top duration-300" onclick="handleToastClick()">
+        <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+          <span id="toastIcon" class="material-symbols-outlined text-2xl">notifications_active</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-center mb-0.5">
+            <h4 id="toastTitle" class="font-bold text-xs text-on-surface truncate">New Notification</h4>
+            <span class="text-[10px] bg-primary text-white font-bold px-1.5 py-0.2 rounded uppercase">Just Now</span>
+          </div>
+          <p id="toastMessage" class="text-xs text-on-surface-variant line-clamp-2 leading-relaxed"></p>
+        </div>
+        <button type="button" onclick="dismissToast(event)" class="text-on-surface-variant hover:text-on-surface p-1">
+          <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+      </div>
+
       <!-- Standard Notifications Drawer -->
       <div id="globalNotifModal" style="display: none;" class="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-xs items-end sm:items-center justify-center p-0 sm:p-4">
         <div id="globalNotifContent" class="w-full max-w-md bg-surface-container-lowest rounded-t-2xl sm:rounded-2xl max-h-[85vh] flex flex-col border border-outline-variant shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom duration-200">
@@ -214,12 +259,26 @@ async function fetchGlobalNotifications() {
       }
     }
 
-    // Check for incoming Emergency Siren alerts!
     if (data.notifications && data.notifications.length > 0) {
+      // 1. Check for Emergency Siren Alerts!
       const latestUnreadEmergency = data.notifications.find(n => n.isEmergency && !n.isRead);
       if (latestUnreadEmergency && !handledEmergencyIds.has(latestUnreadEmergency.id)) {
         handledEmergencyIds.add(latestUnreadEmergency.id);
         triggerEmergencyPopup(latestUnreadEmergency);
+      }
+
+      // 2. Check for newly arrived general notifications (Show Toast Banner & Chime)
+      if (!isFirstFetch) {
+        const newest = data.notifications[0];
+        if (newest && !newest.isRead && !seenNotificationIds.has(newest.id)) {
+          seenNotificationIds.add(newest.id);
+          if (!newest.isEmergency) {
+            showToastBanner(newest);
+          }
+        }
+      } else {
+        data.notifications.forEach(n => seenNotificationIds.add(n.id));
+        isFirstFetch = false;
       }
     }
 
@@ -267,6 +326,49 @@ async function fetchGlobalNotifications() {
   } catch (e) {
     console.error('Error loading notifications:', e);
   }
+}
+
+function showToastBanner(notif) {
+  const toast = document.getElementById('liveToastBanner');
+  if (!toast) return;
+  document.getElementById('toastTitle').textContent = notif.title;
+  document.getElementById('toastMessage').textContent = notif.message;
+  
+  toast.style.display = 'flex';
+  playGentleChime();
+
+  // Show Native Phone Status Bar Push Notification if supported
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try {
+      new Notification(notif.title, {
+        body: notif.message,
+        icon: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBI2oc_Spp8I6sgWaFMdsSaFj6HCk6B0FcQPjuW5ESxOxg1qEkS2UujcZNWktzJc8s5jwVXxfZcpXC-_nT7qoyZfCico0MZXOysuOfdYGH_BObereTalqbra5mCuW0jZ4k0JiWCqJUizNUxZ0eoHab6alVwGgUk4JVZXPKdivAOY5RPtWQVl8LjrPw0-RknTkFttseIwCfgur0EmzMkWGVWB07KHOChoA5J8VhKNoq1A7a7uu-LpA0X4w',
+        vibrate: [200, 100, 200]
+      });
+    } catch(e) {}
+  }
+
+  // Auto-hide toast after 8 seconds
+  setTimeout(() => {
+    if (toast.style.display !== 'none') {
+      toast.style.display = 'none';
+    }
+  }, 8000);
+}
+
+function handleToastClick() {
+  const toast = document.getElementById('liveToastBanner');
+  if (toast) toast.style.display = 'none';
+  openGlobalNotifications();
+}
+
+function dismissToast(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  const toast = document.getElementById('liveToastBanner');
+  if (toast) toast.style.display = 'none';
 }
 
 function triggerEmergencyPopup(notif) {
@@ -410,7 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
   injectNotificationUI();
   fetchGlobalNotifications();
   checkRoleForNotifications();
-  setInterval(fetchGlobalNotifications, 3500);
+  setInterval(fetchGlobalNotifications, 3000);
 });
 
 // Expose globally
@@ -423,3 +525,5 @@ window.openGlobalBroadcastModal = openGlobalBroadcastModal;
 window.closeGlobalBroadcastModal = closeGlobalBroadcastModal;
 window.submitGlobalBroadcast = submitGlobalBroadcast;
 window.dismissEmergencySiren = dismissEmergencySiren;
+window.handleToastClick = handleToastClick;
+window.dismissToast = dismissToast;
