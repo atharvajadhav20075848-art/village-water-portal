@@ -3,3 +3,5 @@ node_modules/
 public/uploads/
 db.json
 android/
+
+.vercel
