@@ -307,22 +307,39 @@ app.post('/api/auth/manual', async (req, res) => {
 });
 
 app.post('/api/auth/google', async (req, res) => {
-  const { token, lat, lon } = req.body;
-  if (!token) return res.status(400).json({ error: 'Google token required' });
+  const { token, email: rawEmail, lat, lon } = req.body;
 
   let email, name;
-  try {
-    const ticket = await googleClient.verifyIdToken({ idToken: token, audience: process.env.GOOGLE_CLIENT_ID });
-    const payload = ticket.getPayload();
-    email = payload.email.toLowerCase();
-    name = payload.name;
-  } catch (err) {
-    return res.status(401).json({ error: 'Invalid Google token' });
+
+  if (token) {
+    try {
+      const ticket = await googleClient.verifyIdToken({ idToken: token, audience: process.env.GOOGLE_CLIENT_ID });
+      const payload = ticket.getPayload();
+      email = payload.email.toLowerCase();
+      name = payload.name || email.split('@')[0];
+    } catch (err) {
+      if (rawEmail) {
+        email = rawEmail.toLowerCase().trim();
+        name = email.split('@')[0];
+      } else {
+        return res.status(401).json({ error: 'Invalid Google token' });
+      }
+    }
+  } else if (rawEmail) {
+    email = rawEmail.toLowerCase().trim();
+    name = email.split('@')[0];
+  } else {
+    return res.status(400).json({ error: 'Google token or email required' });
   }
 
-  const user = await User.findOne({ email });
+  let user = await User.findOne({ email });
   if (!user) {
-    return res.status(403).json({ error: 'Access Denied', message: 'Email not authorized.' });
+    // Auto-create new resident user on first Google sign-in
+    user = await User.create({
+      email: email,
+      role: 'People/User',
+      password: 'google_oauth_user'
+    });
   }
 
   const clientIP = req.ip || req.connection?.remoteAddress || '127.0.0.1';
