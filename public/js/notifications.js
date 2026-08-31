@@ -11,12 +11,30 @@ let handledEmergencyIds = new Set();
 let seenNotificationIds = new Set();
 let isFirstFetch = true;
 
+// ── Audio Unlocker for Mobile Chrome & Webviews ────────────────────────
+function unlockAudioContext() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!sirenAudioContext && AudioContext) {
+      sirenAudioContext = new AudioContext();
+    }
+    if (sirenAudioContext && sirenAudioContext.state === 'suspended') {
+      sirenAudioContext.resume();
+    }
+  } catch(e) {}
+}
+window.addEventListener('click', unlockAudioContext, { passive: true });
+window.addEventListener('touchstart', unlockAudioContext, { passive: true });
+window.addEventListener('pointerdown', unlockAudioContext, { passive: true });
+
 // ── Web Audio API Siren Generator (Loud & Universal) ──────────────────
 function startSirenSound() {
   if (isSirenPlaying) return;
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-    sirenAudioContext = new AudioContext();
+    if (!sirenAudioContext) {
+      sirenAudioContext = new AudioContext();
+    }
     if (sirenAudioContext.state === 'suspended') {
       sirenAudioContext.resume();
     }
@@ -25,34 +43,39 @@ function startSirenSound() {
     sirenGain = sirenAudioContext.createGain();
 
     sirenOscillator.type = 'sawtooth';
-    sirenGain.gain.setValueAtTime(0.85, sirenAudioContext.currentTime);
+    sirenGain.gain.setValueAtTime(0.9, sirenAudioContext.currentTime);
 
     sirenOscillator.connect(sirenGain);
     sirenGain.connect(sirenAudioContext.destination);
 
     let isHigh = false;
-    sirenOscillator.frequency.setValueAtTime(650, sirenAudioContext.currentTime);
+    sirenOscillator.frequency.setValueAtTime(600, sirenAudioContext.currentTime);
     sirenOscillator.start();
     isSirenPlaying = true;
+
+    // Vibrate phone initially
+    if ('vibrate' in navigator) {
+      navigator.vibrate([1000, 200, 1000, 200, 1000]);
+    }
 
     sirenInterval = setInterval(() => {
       if (!isSirenPlaying || !sirenOscillator) return;
       isHigh = !isHigh;
-      const targetFreq = isHigh ? 1000 : 600;
-      sirenOscillator.frequency.exponentialRampToValueAtTime(targetFreq, sirenAudioContext.currentTime + 0.35);
-    }, 400);
-
-    // Vibration on mobile phones
-    if ('vibrate' in navigator) {
-      navigator.vibrate([800, 200, 800, 200, 800, 200, 1200]);
-    }
+      const targetFreq = isHigh ? 1100 : 550;
+      if (sirenAudioContext && sirenAudioContext.state === 'running') {
+        sirenOscillator.frequency.exponentialRampToValueAtTime(targetFreq, sirenAudioContext.currentTime + 0.3);
+      }
+      // Continuous vibration pulse on every pitch cycle
+      if ('vibrate' in navigator && isHigh) {
+        navigator.vibrate([500, 100, 500]);
+      }
+    }, 380);
   } catch (e) {
     console.error('Audio siren init error:', e);
   }
 }
 
 function stopSirenSound() {
-  if (!isSirenPlaying) return;
   isSirenPlaying = false;
   if (sirenInterval) {
     clearInterval(sirenInterval);
@@ -509,12 +532,18 @@ async function checkRoleForNotifications() {
   } catch(e) {}
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function startNotificationSystem() {
   injectNotificationUI();
   fetchGlobalNotifications();
   checkRoleForNotifications();
-  setInterval(fetchGlobalNotifications, 3000);
-});
+  setInterval(fetchGlobalNotifications, 2000);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startNotificationSystem);
+} else {
+  startNotificationSystem();
+}
 
 // Expose globally
 window.fetchGlobalNotifications = fetchGlobalNotifications;
