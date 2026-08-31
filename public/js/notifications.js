@@ -117,13 +117,13 @@ function playGentleChime() {
 }
 
 function injectNotificationUI() {
-  const headerRight = document.querySelector('header .flex.items-center.gap-xs, header .flex.items-center.gap-sm:last-child');
+  const headerRight = document.querySelector('header .flex.items-center.gap-xs, header .flex.items-center.gap-1\\.5, header .flex.items-center.gap-1, header .flex.items-center.gap-sm:last-child');
   
   if (headerRight && !document.getElementById('globalNotifBellBtn')) {
     const bellBtn = document.createElement('button');
     bellBtn.id = 'globalNotifBellBtn';
     bellBtn.type = 'button';
-    bellBtn.className = 'relative p-2 text-primary hover:bg-surface-container-low rounded-full transition-all focus:outline-none flex items-center justify-center';
+    bellBtn.className = 'relative p-1.5 text-primary hover:bg-surface-container-low rounded-full transition-all focus:outline-none flex items-center justify-center shrink-0';
     bellBtn.title = 'Notifications';
     bellBtn.onclick = (e) => {
       e.preventDefault();
@@ -131,8 +131,8 @@ function injectNotificationUI() {
       toggleGlobalNotifications();
     };
     bellBtn.innerHTML = `
-      <span class="material-symbols-outlined text-[24px]">notifications</span>
-      <span id="globalNotifBadge" class="hidden absolute top-1 right-1 h-4 w-4 bg-error text-white text-[10px] font-bold rounded-full items-center justify-center pointer-events-none">0</span>
+      <span class="material-symbols-outlined text-[22px]">notifications</span>
+      <span id="globalNotifBadge" class="hidden absolute -top-0.5 -right-0.5 h-4 w-4 bg-error text-white text-[10px] font-bold rounded-full items-center justify-center pointer-events-none">0</span>
     `;
     headerRight.insertBefore(bellBtn, headerRight.firstChild);
   }
