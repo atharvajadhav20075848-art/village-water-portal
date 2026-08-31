@@ -3,7 +3,7 @@
   "appName": "Gram Jal Portal",
   "webDir": "public",
   "server": {
-    "url": "https://stitchvillagewatermanagementportal.vercel.app/app",
+    "url": "https://villagewatermanagementportal.vercel.app/app",
     "cleartext": true,
     "androidScheme": "https"
   },

@@ -105,6 +105,7 @@ const Notification = mongoose.models.Notification || mongoose.model('Notificatio
   targetRole: { type: String, default: 'all' }, // 'all', 'People/User', 'Sarpanch', 'Admin'
   targetEmail: { type: String, default: '' },
   type: { type: String, default: 'general' }, // 'issue', 'broadcast', 'general'
+  isEmergency: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   readBy: { type: [String], default: [] }
 }));
@@ -377,7 +378,7 @@ app.get('/api/notifications', async (req, res) => {
 
 // Sarpanch / Admin can create custom notifications
 app.post('/api/notifications', requireAuth(['Admin', 'Sarpanch']), async (req, res) => {
-  const { title, message, targetRole } = req.body;
+  const { title, message, targetRole, isEmergency } = req.body;
   if (!title || !message) {
     return res.status(400).json({ error: 'Title and message are required' });
   }
@@ -389,7 +390,8 @@ app.post('/api/notifications', requireAuth(['Admin', 'Sarpanch']), async (req, r
     senderName: req.session.user?.name || req.session.user?.email || 'Sarpanch Office',
     senderRole: req.session.user?.role || 'Sarpanch',
     targetRole: targetRole || 'all',
-    type: 'broadcast',
+    type: isEmergency ? 'alert' : 'broadcast',
+    isEmergency: Boolean(isEmergency),
     createdAt: new Date(),
     readBy: [req.session.user?.email]
   });
@@ -398,7 +400,7 @@ app.post('/api/notifications', requireAuth(['Admin', 'Sarpanch']), async (req, r
     id: Date.now(),
     name: req.session.user?.name || 'Sarpanch',
     time: new Date().toISOString(),
-    action: `Sent village notification: "${title}"`,
+    action: `${isEmergency ? '🚨 EMERGENCY SIREN ALERT' : 'Sent village notification'}: "${title}"`,
     location: req.session.user?.location || 'Panchayat Bhavan',
     ip: req.session.user?.ip || '::1',
     phone: 'N/A'
