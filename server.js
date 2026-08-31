@@ -34,7 +34,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'gram-panchayat-water-secret-key-12345',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }
+  cookie: { maxAge: 365 * 24 * 60 * 60 * 1000 } // 1 year persistent session
 }));
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -448,7 +448,20 @@ app.put('/api/admin/users/:email/password', requireAuth(['Admin']), async (req, 
     { new: true }
   );
   if (!user) return res.status(404).json({ error: 'User not found' });
-  res.json({ success: true });
+  res.json({ success: true, user });
+});
+
+app.put('/api/admin/users/:email/role', requireAuth(['Admin']), async (req, res) => {
+  const { role } = req.body;
+  if (!role) return res.status(400).json({ error: 'Role is required' });
+  
+  const user = await User.findOneAndUpdate(
+    { email: req.params.email.toLowerCase() },
+    { role: role },
+    { new: true }
+  );
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  res.json({ success: true, user });
 });
 
 app.get('/api/admin/roles', requireAuth(['Admin']), async (req, res) => {
@@ -459,10 +472,15 @@ app.get('/api/admin/roles', requireAuth(['Admin']), async (req, res) => {
 });
 
 app.post('/api/admin/roles', requireAuth(['Admin']), async (req, res) => {
-  const { email, role } = req.body;
+  const { email, role, password } = req.body;
+  if (!email || !role) return res.status(400).json({ error: 'Email and role required' });
+  
+  const updateData = { role: role };
+  if (password) updateData.password = password;
+
   const user = await User.findOneAndUpdate(
-    { email: email.toLowerCase() },
-    { role: role },
+    { email: email.toLowerCase().trim() },
+    { $set: updateData },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   );
   res.json({ success: true, user });

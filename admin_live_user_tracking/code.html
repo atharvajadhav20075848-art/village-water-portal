@@ -90,6 +90,24 @@
 </div>
 </section>
 
+<!-- Emergency Siren Broadcast Section -->
+<section class="px-container-margin py-md flex flex-col gap-md">
+  <div class="bg-error-container/30 border-2 border-error rounded-xl p-md flex flex-col gap-sm shadow-sm">
+    <div class="flex items-center gap-xs text-error font-bold">
+      <span class="material-symbols-outlined text-2xl animate-pulse">warning</span>
+      <h2 class="font-headline-md text-base">Village Emergency Siren &amp; Alarm System</h2>
+    </div>
+    <p class="text-xs text-on-surface-variant">Triggering this will immediately play a loud emergency police siren and auto-open the emergency screen on all logged-in phones!</p>
+    <div class="flex flex-col md:flex-row gap-sm mt-1">
+      <input id="adminEmergencyTitle" placeholder="Alert Title (e.g. Flood Warning / Pipeline Burst)" class="flex-1 p-2 bg-surface text-sm border border-outline-variant rounded font-body-md">
+      <input id="adminEmergencyMsg" placeholder="Details for villagers (e.g. Keep taps closed)" class="flex-1 p-2 bg-surface text-sm border border-outline-variant rounded font-body-md">
+      <button onclick="triggerAdminSiren()" class="px-4 py-2 bg-error text-white font-label-bold text-xs uppercase rounded flex items-center justify-center gap-1 shadow-md hover:bg-red-700 active:scale-95 transition-all">
+        <span class="material-symbols-outlined text-base">volume_up</span> Blast Siren on All Phones
+      </button>
+    </div>
+  </div>
+</section>
+
 <!-- Active Sessions Section -->
 <section class="px-container-margin py-md flex flex-col gap-md">
   <h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-sm">
@@ -108,25 +126,29 @@
     User Management &amp; Passwords
   </h2>
   <div class="bg-surface border border-outline-variant rounded-xl p-md flex flex-col gap-md">
-    <form id="whitelistForm" class="flex flex-col md:flex-row gap-sm items-end">
-      <div class="flex-1 flex flex-col gap-xs">
-        <label class="font-label-bold text-label-bold text-on-surface uppercase" for="whitelistEmail" data-i18n="auto_key_38">Email Address</label>
-        <input class="w-full min-h-[48px] px-md bg-surface-container-low text-on-surface rounded border border-outline-variant focus:outline-none" id="whitelistEmail" placeholder="email@village.gov.in" required="" type="email">
+    <form id="whitelistForm" class="flex flex-col md:grid md:grid-cols-4 gap-sm items-end">
+      <div class="flex flex-col gap-xs w-full">
+        <label class="font-label-bold text-xs text-on-surface uppercase" for="whitelistEmail" data-i18n="auto_key_38">Email Address</label>
+        <input class="w-full min-h-[44px] px-md bg-surface-container-low text-on-surface rounded border border-outline-variant focus:outline-none text-sm" id="whitelistEmail" placeholder="email@village.gov.in" required="" type="email">
       </div>
-      <div class="flex-1 flex flex-col gap-xs">
-        <label class="font-label-bold text-label-bold text-on-surface uppercase" for="whitelistRole" data-i18n="auto_key_39">Assigned Role</label>
-        <select class="w-full min-h-[48px] px-md bg-surface-container-low text-on-surface rounded border border-outline-variant focus:outline-none" id="whitelistRole">
-          <option>Admin</option>
-          <option>Sarpanch</option>
-          <option>People/User</option>
+      <div class="flex flex-col gap-xs w-full">
+        <label class="font-label-bold text-xs text-on-surface uppercase" for="whitelistPass">Password</label>
+        <input class="w-full min-h-[44px] px-md bg-surface-container-low text-on-surface rounded border border-outline-variant focus:outline-none text-sm" id="whitelistPass" placeholder="user123" required="" type="text">
+      </div>
+      <div class="flex flex-col gap-xs w-full">
+        <label class="font-label-bold text-xs text-on-surface uppercase" for="whitelistRole" data-i18n="auto_key_39">Assigned Role</label>
+        <select class="w-full min-h-[44px] px-md bg-surface-container-low text-on-surface rounded border border-outline-variant focus:outline-none text-sm" id="whitelistRole">
+          <option value="Admin">Admin</option>
+          <option value="Sarpanch">Sarpanch</option>
+          <option value="People/User">People/User</option>
         </select>
       </div>
-      <button class="min-h-[48px] px-lg bg-primary text-on-primary font-label-bold rounded hover:bg-primary/95 transition-colors uppercase" type="submit" data-i18n="auto_key_36">Add/Update Role</button>
+      <button class="w-full min-h-[44px] px-lg bg-primary text-on-primary font-label-bold rounded hover:bg-primary/95 transition-colors uppercase text-xs" type="submit" data-i18n="auto_key_36">Save User</button>
     </form>
     
     <div class="border-t border-outline-variant pt-sm">
-      <h3 class="font-label-bold text-label-bold text-on-surface mb-sm" data-i18n="auto_key_32">Registered Users</h3>
-      <div id="whitelist-accounts-list" class="flex flex-col gap-sm max-h-64 overflow-y-auto">
+      <h3 class="font-label-bold text-label-bold text-on-surface mb-sm" data-i18n="auto_key_32">Registered Users &amp; Live Roles</h3>
+      <div id="whitelist-accounts-list" class="flex flex-col gap-sm max-h-80 overflow-y-auto">
         <!-- User entries populated dynamically -->
       </div>
     </div>
@@ -253,15 +275,20 @@ async function loadAdminPageData() {
 
     users.forEach(user => {
       whitelistContainer.innerHTML += `
-        <div class="flex justify-between items-center bg-surface-container-low p-sm rounded border border-outline-variant">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-surface-container-low p-sm rounded border border-outline-variant gap-2">
           <div>
             <p class="font-body-md font-bold text-on-surface">${user.email}</p>
             <p class="text-xs text-on-surface-variant flex items-center gap-2 mt-1">
-              <span class="bg-primary/10 text-primary px-2 py-0.5 rounded font-label-bold uppercase">${user.role}</span>
-              <span class="font-mono text-on-surface">Pass: ${user.password}</span>
+              <span class="font-mono text-on-surface bg-surface px-1.5 py-0.5 rounded border border-outline-variant">Pass: ${user.password || '******'}</span>
             </p>
           </div>
-          <div class="flex items-center gap-xs">
+          <div class="flex items-center gap-sm">
+            <!-- Direct Role Switcher -->
+            <select onchange="changeUserRole('${user.email}', this.value)" class="text-xs font-bold px-2 py-1 bg-surface text-primary border border-outline-variant rounded focus:outline-none focus:border-primary">
+              <option value="Admin" ${user.role === 'Admin' ? 'selected' : ''}>Admin</option>
+              <option value="Sarpanch" ${user.role === 'Sarpanch' ? 'selected' : ''}>Sarpanch</option>
+              <option value="People/User" ${user.role === 'People/User' ? 'selected' : ''}>People/User</option>
+            </select>
             <button onclick="changePassword('${user.email}')" class="p-xs text-secondary hover:bg-secondary/10 rounded-full transition-colors" title="Change Password">
               <span class="material-symbols-outlined text-[20px]">key</span>
             </button>
@@ -275,6 +302,49 @@ async function loadAdminPageData() {
   } catch (err) {
     console.error(err);
   }
+}
+
+async function changeUserRole(email, newRole) {
+  try {
+    const res = await fetch(`/api/admin/users/${email}/role`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: newRole })
+    });
+    if (res.ok) {
+      alert(`User ${email} role successfully changed to ${newRole}!`);
+      loadAdminPageData();
+    } else {
+      alert("Failed to update role.");
+    }
+  } catch (e) { console.error(e); }
+}
+
+async function triggerAdminSiren() {
+  const title = document.getElementById('adminEmergencyTitle').value.trim();
+  const message = document.getElementById('adminEmergencyMsg').value.trim();
+  if (!title || !message) {
+    alert("Please enter both an alert title and emergency message.");
+    return;
+  }
+  if (!confirm(`🚨 Are you sure you want to BLAST SIREN on all village users' phones for:\n\n"${title}"?`)) return;
+
+  try {
+    const res = await fetch('/api/notifications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, message, targetRole: 'all', isEmergency: true })
+    });
+    if (res.ok) {
+      alert("🚨 EMERGENCY SIREN BROADCASTED TO ALL PHONES!");
+      document.getElementById('adminEmergencyTitle').value = '';
+      document.getElementById('adminEmergencyMsg').value = '';
+      loadAdminPageData();
+      if (window.fetchGlobalNotifications) window.fetchGlobalNotifications();
+    } else {
+      alert("Failed to trigger emergency alert.");
+    }
+  } catch (e) { console.error(e); }
 }
 
 async function changePassword(email) {
@@ -296,23 +366,26 @@ async function changePassword(email) {
   }
 }
 
-// Add user to whitelist
+// Add user to whitelist with password & role
 document.getElementById('whitelistForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const email = document.getElementById('whitelistEmail').value;
+  const email = document.getElementById('whitelistEmail').value.trim();
+  const password = document.getElementById('whitelistPass').value.trim();
   const role = document.getElementById('whitelistRole').value;
   
   try {
     const res = await fetch('/api/admin/roles', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, role })
+      body: JSON.stringify({ email, role, password })
     });
     if (res.ok) {
+      alert(`User ${email} created/updated with role ${role}!`);
       document.getElementById('whitelistEmail').value = '';
+      document.getElementById('whitelistPass').value = '';
       loadAdminPageData();
     } else {
-      alert("Failed to update roles whitelists.");
+      alert("Failed to save user.");
     }
   } catch (err) {
     console.error(err);

@@ -129,6 +129,19 @@ async function handleCredentialResponse(response) {
     alert('Server error connecting to authentication service.');
   }
 }
+
+// Auto-login persistent check
+async function checkExistingSession() {
+  try {
+    const res = await fetch('/api/auth/status');
+    const data = await res.json();
+    if (data.loggedIn) {
+      const isMobile = window.innerWidth <= 768;
+      window.location.href = isMobile ? '/app' : '/home';
+    }
+  } catch (e) {}
+}
+checkExistingSession();
 </script>
 <script src="/public/js/i18n.js"></script>
 </body></html>

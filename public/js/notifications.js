@@ -410,10 +410,11 @@ document.addEventListener('DOMContentLoaded', () => {
   injectNotificationUI();
   fetchGlobalNotifications();
   checkRoleForNotifications();
-  setInterval(fetchGlobalNotifications, 10000);
+  setInterval(fetchGlobalNotifications, 3500);
 });
 
 // Expose globally
+window.fetchGlobalNotifications = fetchGlobalNotifications;
 window.toggleGlobalNotifications = toggleGlobalNotifications;
 window.openGlobalNotifications = openGlobalNotifications;
 window.closeGlobalNotifications = closeGlobalNotifications;
