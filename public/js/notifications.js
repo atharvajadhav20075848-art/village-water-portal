@@ -284,15 +284,22 @@ async function fetchGlobalNotifications() {
     }
 
     if (data.notifications && data.notifications.length > 0) {
-      // 1. Check for Emergency Siren Alerts!
-      const latestUnreadEmergency = data.notifications.find(n => n.isEmergency && !n.isRead);
-      if (latestUnreadEmergency && !handledEmergencyIds.has(latestUnreadEmergency.id)) {
-        handledEmergencyIds.add(latestUnreadEmergency.id);
-        triggerEmergencyPopup(latestUnreadEmergency);
-      }
+      if (isFirstFetch) {
+        // Initial fetch on app open: record all existing notifications as known so NO unwanted sound plays on startup
+        data.notifications.forEach(n => {
+          seenNotificationIds.add(n.id);
+          handledEmergencyIds.add(n.id);
+        });
+        isFirstFetch = false;
+      } else {
+        // 1. Check for newly arriving Emergency Siren Alerts
+        const latestUnreadEmergency = data.notifications.find(n => n.isEmergency && !n.isRead);
+        if (latestUnreadEmergency && !handledEmergencyIds.has(latestUnreadEmergency.id)) {
+          handledEmergencyIds.add(latestUnreadEmergency.id);
+          triggerEmergencyPopup(latestUnreadEmergency);
+        }
 
-      // 2. Check for newly arrived general notifications (Show Toast Banner & Chime)
-      if (!isFirstFetch) {
+        // 2. Check for newly arriving general notifications (Show Toast Banner & Chime)
         const newest = data.notifications[0];
         if (newest && !newest.isRead && !seenNotificationIds.has(newest.id)) {
           seenNotificationIds.add(newest.id);
@@ -300,9 +307,6 @@ async function fetchGlobalNotifications() {
             showToastBanner(newest);
           }
         }
-      } else {
-        data.notifications.forEach(n => seenNotificationIds.add(n.id));
-        isFirstFetch = false;
       }
     }
 
