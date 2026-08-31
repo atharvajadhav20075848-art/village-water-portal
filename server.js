@@ -638,13 +638,18 @@ app.delete('/api/issues/:id', requireAuth(['Admin']), async (req, res) => {
 
 app.put('/api/issues/:id/resolve', requireAuth(['Admin', 'Sarpanch']), upload.single('photo'), async (req, res) => {
   const issueId = parseInt(req.params.id, 10);
-  
+  const existing = await Issue.findOne({ id: issueId });
+  if (!existing) return res.status(404).json({ error: 'Issue not found' });
+
+  const resolutionPhoto = req.file ? req.file.path : (existing.photoUrl || 'https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&q=80&w=600');
+
   const updated = await Issue.findOneAndUpdate(
     { id: issueId },
     { 
       status: 'Resolved',
       resolvedBy: req.session.user.email,
-      resolutionPhotoUrl: req.file ? req.file.path : null
+      resolvedAt: new Date(),
+      resolutionPhotoUrl: resolutionPhoto
     },
     { new: true }
   );
@@ -655,8 +660,8 @@ app.put('/api/issues/:id/resolve', requireAuth(['Admin', 'Sarpanch']), upload.si
   await Notification.create({
     id: Date.now(),
     title: `Issue Resolved: ${updated.title}`,
-    message: `Issue at ${updated.location} was resolved by ${req.session.user.role} (${req.session.user.name}).`,
-    senderName: req.session.user.name,
+    message: `Issue at ${updated.location} was resolved by ${req.session.user.role} (${req.session.user.name || req.session.user.email}).`,
+    senderName: req.session.user.name || 'Gram Panchayat',
     senderRole: req.session.user.role,
     targetRole: 'all',
     type: 'issue',
@@ -666,11 +671,11 @@ app.put('/api/issues/:id/resolve', requireAuth(['Admin', 'Sarpanch']), upload.si
 
   await Feed.create({
     id: Date.now(),
-    name: req.session.user.name,
+    name: req.session.user.name || req.session.user.email,
     time: new Date().toISOString(),
-    action: `Resolved issue #${issueId}`,
-    location: req.session.user.location,
-    ip: req.session.user.ip,
+    action: `Resolved issue #${issueId}: "${updated.title}"`,
+    location: req.session.user.location || 'Panchayat Office',
+    ip: req.session.user.ip || '127.0.0.1',
     phone: 'N/A'
   });
 

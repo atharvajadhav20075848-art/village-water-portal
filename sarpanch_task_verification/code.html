@@ -137,29 +137,32 @@
           containerSolved.innerHTML = '<p class="text-sm text-on-surface-variant italic p-4 text-center">No resolved tasks.</p>';
         } else {
           solvedItems.forEach(item => {
-            const dateStr = new Date(item.dateResolved).toLocaleDateString();
+            const dateStr = item.resolvedAt ? new Date(item.resolvedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : (item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recently');
+            const beforeImg = item.photoUrl || 'https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&q=80&w=600';
+            const afterImg = item.resolutionPhotoUrl || item.photoUrl || 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&q=80&w=600';
+
             containerSolved.innerHTML += `
-              <div class="bg-white border border-outline-variant rounded-lg overflow-hidden opacity-80">
+              <div class="bg-white border border-outline-variant rounded-lg overflow-hidden opacity-90 shadow-sm">
                 <div class="p-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-start">
                   <div>
                     <h3 class="font-headline-md text-headline-md text-on-surface line-through decoration-outline-variant">${item.title}</h3>
                     <p class="font-body-md text-body-md text-on-surface-variant mt-1">Resolved: ${dateStr}</p>
                   </div>
                   <div class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full flex items-center gap-1 border border-secondary">
-                    <span class="material-symbols-outlined text-[16px]">check</span>
+                    <span class="material-symbols-outlined text-[16px]">check_circle</span>
                     <span class="font-status-badge text-status-badge">Solved</span>
                   </div>
                 </div>
                 <div class="p-4">
                   <p class="font-body-md text-body-md text-on-surface mb-4">${item.description}</p>
-                  <div class="flex gap-2 mb-4">
-                    <div class="flex-1 relative cursor-pointer group" onclick="openLightbox('${item.photoUrl}')" title="Click to view original issue image">
-                      <div class="absolute top-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider z-10">Before</div>
-                      <img class="w-full h-32 object-cover rounded border border-outline-variant group-hover:opacity-90 transition-all" src="${item.photoUrl}" />
+                  <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="relative cursor-pointer group rounded overflow-hidden" onclick="openLightbox('${beforeImg}')" title="Click to view original issue image">
+                      <div class="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider z-10">Before</div>
+                      <img class="w-full h-36 object-cover rounded border border-outline-variant group-hover:scale-105 transition-all" src="${beforeImg}" />
                     </div>
-                    <div class="flex-1 relative cursor-pointer group" onclick="openLightbox('${item.resolutionPhotoUrl || item.photoUrl}')" title="Click to view resolved issue image">
+                    <div class="relative cursor-pointer group rounded overflow-hidden" onclick="openLightbox('${afterImg}')" title="Click to view resolved issue image">
                       <div class="absolute top-2 left-2 bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider z-10">After</div>
-                      <img class="w-full h-32 object-cover rounded border border-outline-variant group-hover:opacity-90 transition-all" src="${item.resolutionPhotoUrl || item.photoUrl}" />
+                      <img class="w-full h-36 object-cover rounded border border-outline-variant group-hover:scale-105 transition-all" src="${afterImg}" />
                     </div>
                   </div>
                   <button onclick="deleteTask(${item.id})" class="w-full py-3 bg-error text-white font-label-bold text-label-bold rounded flex items-center justify-center gap-2 active:bg-error/90" style="display: ${window.userRole === 'Admin' ? 'flex' : 'none'};">
@@ -177,22 +180,18 @@
     }
 
     async function resolveTask(id) {
-      if (!confirm("Confirm marking this water task resolved? You will need to upload a photo of the completed work.")) return;
-
-      // Create a hidden file input to capture a photo
+      // Create and attach a file picker
       const fileInput = document.createElement('input');
       fileInput.type = 'file';
       fileInput.accept = 'image/*';
-      fileInput.capture = 'environment'; // Suggests back camera on mobile
+      fileInput.style.display = 'none';
+      document.body.appendChild(fileInput);
       
       fileInput.onchange = async () => {
-        if (!fileInput.files || fileInput.files.length === 0) {
-          alert("Photo upload is required to resolve this task.");
-          return;
-        }
-
         const formData = new FormData();
-        formData.append('photo', fileInput.files[0]);
+        if (fileInput.files && fileInput.files[0]) {
+          formData.append('photo', fileInput.files[0]);
+        }
 
         try {
           const res = await fetch(`/api/issues/${id}/resolve`, {
@@ -200,19 +199,43 @@
             body: formData
           });
           if (res.ok) {
-            alert("Task marked as resolved successfully!");
-            window.location.href = '/home'; // Redirect to home page
+            alert("✅ Task marked as resolved successfully!");
+            window.location.href = '/home';
           } else {
-            alert("Failed to resolve task.");
+            const errData = await res.json().catch(() => ({}));
+            alert("Failed to resolve task: " + (errData.error || "Server error"));
           }
         } catch (err) {
           console.error(err);
           alert("Error uploading resolution.");
+        } finally {
+          document.body.removeChild(fileInput);
         }
       };
 
-      // Trigger the file picker
-      fileInput.click();
+      // If user confirms, trigger file picker; if cancelled file dialog, still offer 1-click resolve
+      if (confirm("Attach a photo of the completed work to resolve this task?\n\nClick 'OK' to choose a photo, or 'Cancel' to resolve without attaching a new photo.")) {
+        fileInput.click();
+      } else {
+        // Resolve directly without attaching a new photo
+        try {
+          const res = await fetch(`/api/issues/${id}/resolve`, {
+            method: 'PUT',
+            body: new FormData()
+          });
+          if (res.ok) {
+            alert("✅ Task marked as resolved successfully!");
+            window.location.href = '/home';
+          } else {
+            const errData = await res.json().catch(() => ({}));
+            alert("Failed to resolve task: " + (errData.error || "Server error"));
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          document.body.removeChild(fileInput);
+        }
+      }
     }
 
     async function deleteTask(id) {

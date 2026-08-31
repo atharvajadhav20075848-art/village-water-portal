@@ -381,8 +381,11 @@ async function loadHomeFixes() {
     }
 
     solved.forEach(item => {
+      const beforeImg = item.photoUrl || 'https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&q=80&w=600';
+      const afterImg = item.resolutionPhotoUrl || item.photoUrl || 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&q=80&w=600';
+
       container.innerHTML += `
-        <article class="bg-surface-container-lowest border border-outline-variant p-md rounded-lg">
+        <article class="bg-surface-container-lowest border border-outline-variant p-md rounded-lg shadow-sm">
           <div class="flex justify-between items-start mb-md">
             <div>
               <h4 class="font-headline-md text-headline-md text-on-surface mb-xs">${item.title}</h4>
@@ -397,13 +400,13 @@ async function loadHomeFixes() {
             </div>
           </div>
           <div class="grid grid-cols-2 gap-sm mb-md">
-            <div class="relative">
-              <div class="absolute top-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded uppercase">Before</div>
-              <div class="w-full h-36 bg-cover bg-center border border-outline-variant rounded" style="background-image: url('${item.photoUrl}')"></div>
+            <div class="relative rounded overflow-hidden">
+              <div class="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded uppercase z-10">Before</div>
+              <img src="${beforeImg}" class="w-full h-36 object-cover border border-outline-variant rounded" />
             </div>
-            <div class="relative">
-              <div class="absolute top-2 left-2 bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded uppercase">After</div>
-              <div class="w-full h-36 bg-cover bg-center border border-outline-variant rounded" style="background-image: url('${item.resolutionPhotoUrl || item.photoUrl}')"></div>
+            <div class="relative rounded overflow-hidden">
+              <div class="absolute top-2 left-2 bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded uppercase z-10">After</div>
+              <img src="${afterImg}" class="w-full h-36 object-cover border border-outline-variant rounded" />
             </div>
           </div>
           <p class="font-body-md text-body-md text-on-surface-variant text-sm">${item.description}</p>
@@ -449,15 +452,16 @@ async function loadTasks() {
       pContainer.innerHTML = '<p class="text-sm text-on-surface-variant italic p-4 text-center">No pending tasks.</p>';
     } else {
       pending.forEach(item => {
+        const itemImg = item.photoUrl || 'https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&q=80&w=600';
         pContainer.innerHTML += `
-          <div class="bg-white border border-outline-variant rounded-lg p-md flex flex-col gap-sm">
+          <div class="bg-white border border-outline-variant rounded-lg p-md flex flex-col gap-sm shadow-sm">
             <div class="flex justify-between items-start">
               <h4 class="font-headline-md text-on-surface">${item.title}</h4>
               <span class="bg-error-container text-on-error-container px-2 py-0.5 rounded text-xs font-label-bold">Pending</span>
             </div>
             <p class="text-xs text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined text-[16px] text-primary">location_on</span> ${item.location}</p>
             <p class="font-body-md text-sm text-on-surface">${item.description}</p>
-            <img src="${item.photoUrl}" class="w-full h-40 object-cover rounded border border-outline-variant" />
+            <img src="${itemImg}" class="w-full h-40 object-cover rounded border border-outline-variant" />
             <button onclick="resolveTaskApp(${item.id})" class="w-full py-3 bg-primary text-white font-label-bold text-xs uppercase rounded flex items-center justify-center gap-xs">
               <span class="material-symbols-outlined text-sm">check_circle</span> Mark as Resolved
             </button>
@@ -470,14 +474,27 @@ async function loadTasks() {
       sContainer.innerHTML = '<p class="text-sm text-on-surface-variant italic p-4 text-center">No resolved tasks.</p>';
     } else {
       solved.forEach(item => {
+        const beforeImg = item.photoUrl || 'https://images.unsplash.com/photo-1584467735815-f778f274e296?auto=format&fit=crop&q=80&w=600';
+        const afterImg = item.resolutionPhotoUrl || item.photoUrl || 'https://images.unsplash.com/photo-1541888946425-d0fbb186c5f7?auto=format&fit=crop&q=80&w=600';
+
         sContainer.innerHTML += `
-          <div class="bg-white border border-outline-variant rounded-lg p-md flex flex-col gap-sm opacity-80">
+          <div class="bg-white border border-outline-variant rounded-lg p-md flex flex-col gap-sm opacity-95 shadow-sm">
             <div class="flex justify-between items-start">
               <h4 class="font-headline-md text-on-surface line-through">${item.title}</h4>
               <span class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-xs font-label-bold">Resolved</span>
             </div>
             <p class="text-xs text-on-surface-variant">${item.location}</p>
             <p class="font-body-md text-sm text-on-surface">${item.description}</p>
+            <div class="grid grid-cols-2 gap-2 mt-1">
+              <div class="relative rounded overflow-hidden">
+                <div class="absolute top-1 left-1 bg-black/70 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase z-10">Before</div>
+                <img src="${beforeImg}" class="w-full h-28 object-cover border border-outline-variant rounded" />
+              </div>
+              <div class="relative rounded overflow-hidden">
+                <div class="absolute top-1 left-1 bg-secondary text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase z-10">After</div>
+                <img src="${afterImg}" class="w-full h-28 object-cover border border-outline-variant rounded" />
+              </div>
+            </div>
           </div>
         `;
       });
@@ -486,24 +503,51 @@ async function loadTasks() {
 }
 
 async function resolveTaskApp(id) {
-  if (!confirm("Confirm marking this task resolved? Photo will be attached.")) return;
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.onchange = async () => {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.style.display = 'none';
+  document.body.appendChild(fileInput);
+
+  fileInput.onchange = async () => {
     const formData = new FormData();
-    if (input.files[0]) formData.append('photo', input.files[0]);
+    if (fileInput.files && fileInput.files[0]) {
+      formData.append('photo', fileInput.files[0]);
+    }
     try {
       const res = await fetch(`/api/issues/${id}/resolve`, { method: 'PUT', body: formData });
       if (res.ok) {
-        alert("Task resolved and village notified!");
+        alert("✅ Task resolved and village notified!");
         loadTasks();
         loadHomeFixes();
         if (window.fetchGlobalNotifications) window.fetchGlobalNotifications();
+      } else {
+        alert("Failed to resolve task.");
       }
     } catch(e) { console.error(e); }
+    finally {
+      document.body.removeChild(fileInput);
+    }
   };
-  input.click();
+
+  if (confirm("Attach a photo of the completed work to resolve this task?\n\nClick 'OK' to select photo, or 'Cancel' to resolve directly.")) {
+    fileInput.click();
+  } else {
+    try {
+      const res = await fetch(`/api/issues/${id}/resolve`, { method: 'PUT', body: new FormData() });
+      if (res.ok) {
+        alert("✅ Task resolved and village notified!");
+        loadTasks();
+        loadHomeFixes();
+        if (window.fetchGlobalNotifications) window.fetchGlobalNotifications();
+      } else {
+        alert("Failed to resolve task.");
+      }
+    } catch(e) { console.error(e); }
+    finally {
+      document.body.removeChild(fileInput);
+    }
+  }
 }
 
 async function initApp() {
