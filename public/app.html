@@ -507,7 +507,10 @@ async function resolveTaskApp(id) {
 
 async function initApp() {
   try {
-    const res = await fetch('/api/auth/status');
+    const savedEmail = localStorage.getItem('gram_user_email');
+    const res = await fetch('/api/auth/status', {
+      headers: savedEmail ? { 'x-user-email': encodeURIComponent(savedEmail) } : {}
+    });
     const data = await res.json();
     if (!data.loggedIn) {
       window.location.href = '/login';
@@ -531,10 +534,12 @@ async function initApp() {
 
 async function logout() {
   if (!confirm("Are you sure you want to logout?")) return;
+  localStorage.removeItem('gram_user_email');
+  localStorage.removeItem('gram_user_role');
   try {
     await fetch('/api/auth/logout', { method: 'POST' });
-    window.location.href = '/login';
   } catch(e) { console.error(e); }
+  window.location.href = '/login';
 }
 
 initApp();

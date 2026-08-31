@@ -208,7 +208,25 @@ function formatLocationString(loc) {
 }
 
 function requireAuth(allowedRoles) {
-  return (req, res, next) => {
+  return async (req, res, next) => {
+    // If session lost in serverless cold start, try restoring from x-user-email header
+    if (!req.session.user && req.headers['x-user-email']) {
+      try {
+        const decodedEmail = decodeURIComponent(req.headers['x-user-email']).toLowerCase().trim();
+        const user = await User.findOne({ email: decodedEmail });
+        if (user) {
+          req.session.user = {
+            email: user.email,
+            name: user.email.split('@')[0],
+            role: user.role,
+            ip: req.ip || '127.0.0.1',
+            location: 'Saved Device',
+            loginTime: new Date().toISOString()
+          };
+        }
+      } catch(e) {}
+    }
+
     if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
     if (allowedRoles && !allowedRoles.includes(req.session.user.role)) return res.status(403).json({ error: 'Forbidden' });
     next();
@@ -323,7 +341,24 @@ app.post('/api/auth/google', async (req, res) => {
   res.json({ success: true, user: req.session.user });
 });
 
-app.get('/api/auth/status', (req, res) => {
+app.get('/api/auth/status', async (req, res) => {
+  if (!req.session.user && req.headers['x-user-email']) {
+    try {
+      const decodedEmail = decodeURIComponent(req.headers['x-user-email']).toLowerCase().trim();
+      const user = await User.findOne({ email: decodedEmail });
+      if (user) {
+        req.session.user = {
+          email: user.email,
+          name: user.email.split('@')[0],
+          role: user.role,
+          ip: req.ip || '127.0.0.1',
+          location: 'Saved Device',
+          loginTime: new Date().toISOString()
+        };
+      }
+    } catch(e) {}
+  }
+
   if (req.session.user) {
     res.json({ loggedIn: true, user: req.session.user });
   } else {

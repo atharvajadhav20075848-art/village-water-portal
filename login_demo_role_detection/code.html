@@ -80,12 +80,16 @@ document.getElementById('manualLoginForm').addEventListener('submit', async (e) 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, lat, lon })
     });
-    if (!res.ok) {
+      const data = await res.json();
+      localStorage.setItem('gram_user_email', data.user.email);
+      localStorage.setItem('gram_user_role', data.user.role);
+      const isMobile = window.innerWidth <= 768;
+      window.location.href = isMobile ? '/app' : '/home';
+    } else {
       const err = await res.json();
       alert(err.message || 'Invalid credentials');
       return;
     }
-    window.location.href = '/home';
   } catch (err) {
     console.error(err);
     alert('Server error');
@@ -105,11 +109,6 @@ async function handleCredentialResponse(response) {
     lon = position.coords.longitude;
   } catch (err) {
     console.warn("Geolocation issue.", err);
-    if (err.code === 1) {
-      alert("Location access was blocked by your browser! We will use a rough network estimate. To fix this, Allow Location in site settings.");
-    } else {
-      console.log("Could not get precise location (timeout/unavailable). Using fallback.");
-    }
   }
 
   try {
@@ -118,12 +117,17 @@ async function handleCredentialResponse(response) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: token, lat, lon })
     });
-    if (!res.ok) {
+    if (res.ok) {
+      const data = await res.json();
+      localStorage.setItem('gram_user_email', data.user.email);
+      localStorage.setItem('gram_user_role', data.user.role);
+      const isMobile = window.innerWidth <= 768;
+      window.location.href = isMobile ? '/app' : '/home';
+    } else {
       const err = await res.json();
       alert(err.message || err.error || 'Access Denied');
       return;
     }
-    window.location.href = '/home';
   } catch (err) {
     console.error(err);
     alert('Server error connecting to authentication service.');
@@ -132,14 +136,19 @@ async function handleCredentialResponse(response) {
 
 // Auto-login persistent check
 async function checkExistingSession() {
-  try {
-    const res = await fetch('/api/auth/status');
-    const data = await res.json();
-    if (data.loggedIn) {
-      const isMobile = window.innerWidth <= 768;
-      window.location.href = isMobile ? '/app' : '/home';
-    }
-  } catch (e) {}
+  const savedEmail = localStorage.getItem('gram_user_email');
+  if (savedEmail) {
+    try {
+      const res = await fetch('/api/auth/status', {
+        headers: { 'x-user-email': encodeURIComponent(savedEmail) }
+      });
+      const data = await res.json();
+      if (data.loggedIn) {
+        const isMobile = window.innerWidth <= 768;
+        window.location.href = isMobile ? '/app' : '/home';
+      }
+    } catch (e) {}
+  }
 }
 checkExistingSession();
 </script>

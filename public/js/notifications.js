@@ -1,4 +1,17 @@
-// Global Notification & Emergency Siren System for Village Water Management Portal
+// Intercept all fetch requests to automatically pass persistent session email
+const originalFetch = window.fetch;
+window.fetch = function(url, options = {}) {
+  const savedEmail = localStorage.getItem('gram_user_email');
+  if (savedEmail) {
+    options.headers = options.headers || {};
+    if (options.headers instanceof Headers) {
+      if (!options.headers.has('x-user-email')) options.headers.set('x-user-email', encodeURIComponent(savedEmail));
+    } else {
+      if (!options.headers['x-user-email']) options.headers['x-user-email'] = encodeURIComponent(savedEmail);
+    }
+  }
+  return originalFetch(url, options);
+};
 
 let isNotifModalOpen = false;
 let sirenAudioContext = null;
