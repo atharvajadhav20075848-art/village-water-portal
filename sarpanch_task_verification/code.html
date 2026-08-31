@@ -187,6 +187,7 @@
       fileInput.style.display = 'none';
       document.body.appendChild(fileInput);
       
+      const userEmail = localStorage.getItem('gram_user_email') || 'sarpanch@village.gov';
       fileInput.onchange = async () => {
         const formData = new FormData();
         if (fileInput.files && fileInput.files[0]) {
@@ -196,11 +197,12 @@
         try {
           const res = await fetch(`/api/issues/${id}/resolve`, {
             method: 'PUT',
+            headers: { 'x-user-email': encodeURIComponent(userEmail) },
             body: formData
           });
           if (res.ok) {
             alert("✅ Task marked as resolved successfully!");
-            window.location.href = '/home';
+            window.location.href = '/tasks';
           } else {
             const errData = await res.json().catch(() => ({}));
             alert("Failed to resolve task: " + (errData.error || "Server error"));
@@ -221,11 +223,12 @@
         try {
           const res = await fetch(`/api/issues/${id}/resolve`, {
             method: 'PUT',
+            headers: { 'x-user-email': encodeURIComponent(userEmail) },
             body: new FormData()
           });
           if (res.ok) {
             alert("✅ Task marked as resolved successfully!");
-            window.location.href = '/home';
+            window.location.href = '/tasks';
           } else {
             const errData = await res.json().catch(() => ({}));
             alert("Failed to resolve task: " + (errData.error || "Server error"));

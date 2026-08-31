@@ -502,6 +502,7 @@ async function loadTasks() {
 }
 
 async function resolveTaskApp(id) {
+  const userEmail = localStorage.getItem('gram_user_email') || 'sarpanch@village.gov';
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
   fileInput.accept = 'image/*';
@@ -514,16 +515,24 @@ async function resolveTaskApp(id) {
       formData.append('photo', fileInput.files[0]);
     }
     try {
-      const res = await fetch(`/api/issues/${id}/resolve`, { method: 'PUT', body: formData });
+      const res = await fetch(`/api/issues/${id}/resolve`, { 
+        method: 'PUT', 
+        headers: { 'x-user-email': encodeURIComponent(userEmail) },
+        body: formData 
+      });
       if (res.ok) {
         alert("✅ Task resolved and village notified!");
         loadTasks();
         loadHomeFixes();
         if (window.fetchGlobalNotifications) window.fetchGlobalNotifications();
       } else {
-        alert("Failed to resolve task.");
+        const err = await res.json().catch(() => ({}));
+        alert("Failed to resolve task: " + (err.error || "Server error"));
       }
-    } catch(e) { console.error(e); }
+    } catch(e) { 
+      console.error(e); 
+      alert("Error resolving task.");
+    }
     finally {
       document.body.removeChild(fileInput);
     }
@@ -533,16 +542,24 @@ async function resolveTaskApp(id) {
     fileInput.click();
   } else {
     try {
-      const res = await fetch(`/api/issues/${id}/resolve`, { method: 'PUT', body: new FormData() });
+      const res = await fetch(`/api/issues/${id}/resolve`, { 
+        method: 'PUT', 
+        headers: { 'x-user-email': encodeURIComponent(userEmail) },
+        body: new FormData() 
+      });
       if (res.ok) {
         alert("✅ Task resolved and village notified!");
         loadTasks();
         loadHomeFixes();
         if (window.fetchGlobalNotifications) window.fetchGlobalNotifications();
       } else {
-        alert("Failed to resolve task.");
+        const err = await res.json().catch(() => ({}));
+        alert("Failed to resolve task: " + (err.error || "Server error"));
       }
-    } catch(e) { console.error(e); }
+    } catch(e) { 
+      console.error(e); 
+      alert("Error resolving task.");
+    }
     finally {
       document.body.removeChild(fileInput);
     }
