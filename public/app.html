@@ -17,11 +17,25 @@
     </button>
     <select class="lang-switcher bg-surface-container-low text-on-surface font-label-bold text-sm rounded-md border border-outline-variant px-2 py-1 focus:outline-none focus:border-primary mr-1"><option value="en">English</option><option value="mr">मराठी (Marathi)</option><option value="hi">हिंदी (Hindi)</option></select><button onclick="logout()" class="text-[11px] text-error font-label-bold uppercase hover:underline mr-1 py-1 px-2 border border-error rounded-full" data-i18n="auto_key_7">Logout</button><img alt="Profile" class="w-8 h-8 rounded-full object-cover border-2 border-primary-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9xl8M-8NUe2E-4TJUhfwoMlXWQVlOo8FbTAZqNrSnRR9n-xWoRkdxOiZ0gYvn2EEz2gdPSVbHCoVyu5cvyDyfJKN4I5NOsjR-sZIEUPPEf4W2S016llIQ4HI7CYcPFTdXF0ToDf0kE95ABGN3kxKHHAmi_4iHRaeqsgRVmU8YmfpghDR-hApGUFwoNvXr5ALTMF3F-s3NV42JV1UDqwfKhb8lpovhvJKnIQN5IGMG0dGHvu5LzFvSNQ"></div></div></header>
 
-<main class="relative w-full pt-16 pb-24 bg-surface">
+<!-- ════ INSTALL APP BANNER ════ -->
+<section id="pwaInstallBanner" class="px-container-margin pt-2">
+  <div class="bg-secondary text-on-secondary p-3 rounded-xl flex items-center justify-between shadow-md">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-2xl text-secondary-fixed">install_mobile</span>
+      <div>
+        <h4 class="font-bold text-xs leading-tight">Install Gram Jal App</h4>
+        <p class="text-[10px] text-secondary-fixed">Add to phone home screen &amp; get alerts</p>
+      </div>
+    </div>
+    <button id="btnPwaInstall" onclick="triggerPwaInstall()" class="px-3 py-1.5 bg-secondary-fixed text-on-secondary-fixed text-xs font-bold uppercase rounded-lg shadow-sm active:scale-95 transition-all flex items-center gap-1">
+      <span class="material-symbols-outlined text-sm">download</span> Install
+    </button>
+  </div>
+</section>
 
 <!-- ════ VIEW 1: HOME ════ -->
 <div id="view-home" class="view-panel flex flex-col w-full gap-xl md:max-w-7xl md:mx-auto md:px-lg">
-  <section class="px-container-margin pt-4">
+  <section class="px-container-margin pt-2">
     <div class="bg-primary text-on-primary p-lg rounded-xl flex items-center justify-between shadow-sm">
       <div>
         <h2 class="font-headline-lg-mobile text-headline-lg-mobile mb-xs" data-i18n="home_success">Village Success</h2>
@@ -524,8 +538,29 @@ async function logout() {
 }
 
 initApp();
-</script>
-<script>
+
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const banner = document.getElementById('pwaInstallBanner');
+  if (banner) banner.classList.remove('hidden');
+});
+
+async function triggerPwaInstall() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      const banner = document.getElementById('pwaInstallBanner');
+      if (banner) banner.style.display = 'none';
+    }
+    deferredPrompt = null;
+  } else {
+    alert("📲 To install Gram Jal App on your Android Phone:\n\n1. Tap the 3-dots menu (⋮) at the top-right corner of Chrome.\n2. Tap 'Install app' (or 'Add to Home screen').\n3. Tap 'Install'!");
+  }
+}
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/public/sw.js').catch(err => console.log('SW registration failed:', err));
 }
