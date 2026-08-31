@@ -512,20 +512,22 @@
       alertBox.classList.add('hidden');
 
       try {
-        const res = await fetch('/api/auth/google', {
+        const res = await fetch('/api/auth/manual', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email })
+          body: JSON.stringify({ email: email, password: password })
         });
         
         if (!res.ok) {
           const errData = await res.json();
-          document.getElementById('login-error-text').textContent = errData.message || 'Access Denied.';
+          document.getElementById('login-error-text').textContent = errData.message || 'Access Denied. Invalid email or password.';
           alertBox.classList.remove('hidden');
           return;
         }
 
         const data = await res.json();
+        localStorage.setItem('gram_user_email', data.user.email);
+        localStorage.setItem('gram_user_role', data.user.role);
         currentUser = data.user;
         setupUserInterface();
         switchScreen('home');
@@ -565,6 +567,8 @@
     });
 
     document.getElementById('logout-btn').addEventListener('click', async () => {
+      localStorage.removeItem('gram_user_email');
+      localStorage.removeItem('gram_user_role');
       await fetch('/api/auth/logout', { method: 'POST' });
       currentUser = null;
       checkAuth();

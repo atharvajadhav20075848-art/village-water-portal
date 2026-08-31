@@ -359,7 +359,7 @@ async function submitReportFromApp() {
       alert("Report submitted successfully! You received a confirmation notice in notifications.");
       document.getElementById('descriptionApp').value = '';
       loadHomeFixes();
-      loadNotifications();
+      if (window.fetchGlobalNotifications) window.fetchGlobalNotifications();
       switchAppTab('home');
     } else {
       alert("Failed to submit issue.");
@@ -499,7 +499,7 @@ async function resolveTaskApp(id) {
         alert("Task resolved and village notified!");
         loadTasks();
         loadHomeFixes();
-        loadNotifications();
+        if (window.fetchGlobalNotifications) window.fetchGlobalNotifications();
       }
     } catch(e) { console.error(e); }
   };
@@ -528,8 +528,7 @@ async function initApp() {
     }
 
     loadHomeFixes();
-    loadNotifications();
-    setInterval(loadNotifications, 20000);
+    if (window.fetchGlobalNotifications) window.fetchGlobalNotifications();
   } catch(e) { console.error(e); }
 }
 
