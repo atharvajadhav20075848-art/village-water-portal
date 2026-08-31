@@ -29,17 +29,26 @@ window.addEventListener('pointerdown', unlockAudioContext, { passive: true });
 
 let customSirenAudio = null;
 
-// ── Custom Sound Pack Emergency Siren (Loud & Dual-Layer) ─────────
-function startSirenSound() {
+// ── Custom Sound Pack Emergency Siren (1-Time Play & Auto-Dismiss) ─────────
+function startSirenSound(soundUrl, playOnce = true, onEndCallback = null) {
   if (isSirenPlaying) return;
   isSirenPlaying = true;
 
   try {
-    if (!customSirenAudio) {
-      customSirenAudio = new Audio('/public/sounds/emergency_siren.wav');
-      customSirenAudio.loop = true;
+    if (customSirenAudio) {
+      customSirenAudio.pause();
+      customSirenAudio = null;
     }
+    const audioSrc = soundUrl || '/public/sounds/emergency_siren.wav';
+    customSirenAudio = new Audio(audioSrc);
+    customSirenAudio.loop = !playOnce;
     customSirenAudio.currentTime = 0;
+
+    customSirenAudio.onended = () => {
+      stopSirenSound();
+      if (onEndCallback) onEndCallback();
+    };
+
     customSirenAudio.play().catch(() => {});
   } catch(e) {}
 
@@ -81,6 +90,16 @@ function startSirenSound() {
         navigator.vibrate([500, 100, 500]);
       }
     }, 380);
+
+    // If playOnce, automatically shut down sound after 7 seconds
+    if (playOnce) {
+      setTimeout(() => {
+        if (isSirenPlaying) {
+          stopSirenSound();
+          if (onEndCallback) onEndCallback();
+        }
+      }, 7000);
+    }
   } catch (e) {
     console.error('Audio siren init error:', e);
   }
@@ -429,7 +448,18 @@ function triggerEmergencyPopup(notif) {
     document.getElementById('emergencyMessage').textContent = notif.message;
     modal.style.display = 'flex';
     modal.classList.remove('hidden');
-    startSirenSound();
+
+    const soundUrl = notif.soundUrl || '/public/sounds/emergency_siren.wav';
+    const playOnce = notif.playOnce !== false;
+
+    startSirenSound(soundUrl, playOnce, () => {
+      // Auto-dismiss popup after sound finishes 1 play!
+      if (playOnce) {
+        setTimeout(() => {
+          dismissEmergencySiren();
+        }, 1500);
+      }
+    });
   }
 }
 
