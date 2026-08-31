@@ -80,6 +80,7 @@ document.getElementById('manualLoginForm').addEventListener('submit', async (e) 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, lat, lon })
     });
+    if (res.ok) {
       const data = await res.json();
       localStorage.setItem('gram_user_email', data.user.email);
       localStorage.setItem('gram_user_role', data.user.role);

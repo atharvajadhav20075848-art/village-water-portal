@@ -32,6 +32,7 @@
   <!-- Dynamic Solved Tasks Populate Here -->
 </div>
 </div>
+<script src="/public/js/auth-persist.js"></script>
 <script>
     const btnPending = document.getElementById('btn-pending');
     const btnSolved = document.getElementById('btn-solved');
@@ -230,8 +231,11 @@
     }
 
     async function verifyAuth() {
+      const savedEmail = localStorage.getItem('gram_user_email');
       try {
-        const authRes = await fetch('/api/auth/status');
+        const authRes = await fetch('/api/auth/status', {
+          headers: savedEmail ? { 'x-user-email': encodeURIComponent(savedEmail) } : {}
+        });
         const authData = await authRes.json();
         if (!authData.loggedIn) {
           window.location.href = '/login';
@@ -273,10 +277,10 @@
 
     async function logout() {
       if (!confirm("Are you sure you want to logout?")) return;
-      try {
-        const res = await fetch('/api/auth/logout', { method: 'POST' });
-        if (res.ok) window.location.href = '/login';
-      } catch(e) { console.error(e); }
+      localStorage.removeItem('gram_user_email');
+      localStorage.removeItem('gram_user_role');
+      try { await fetch('/api/auth/logout', { method: 'POST' }); } catch(e) {}
+      window.location.href = '/login';
     }
 
     // Lightbox Logic

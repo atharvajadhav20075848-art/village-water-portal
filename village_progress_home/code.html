@@ -70,10 +70,14 @@
 <a class="flex flex-col items-center justify-center min-w-[64px] text-on-surface-variant transition-colors" data-path="support" href="/support"><span class="material-symbols-outlined">mail</span><span class="font-label-bold text-[10px] uppercase tracking-wider" data-i18n="nav_support_short">Support</span></a>
 </div>
 </nav>
+<script src="/public/js/auth-persist.js"></script>
 <script>
 async function checkAuthAndLoad() {
   try {
-    const authRes = await fetch('/api/auth/status');
+    const savedEmail = localStorage.getItem('gram_user_email');
+    const authRes = await fetch('/api/auth/status', {
+      headers: savedEmail ? { 'x-user-email': encodeURIComponent(savedEmail) } : {}
+    });
     const authData = await authRes.json();
     if (!authData.loggedIn) {
       window.location.href = '/login';

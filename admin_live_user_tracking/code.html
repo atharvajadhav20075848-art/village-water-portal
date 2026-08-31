@@ -186,10 +186,36 @@
 </div>
 </section>
 </div>
+<script src="/public/js/auth-persist.js"></script>
 <script>
+// Global fetch interceptor — passes saved user email on every API call
+// so Vercel serverless can re-hydrate the session if it was lost
+(function() {
+  const _fetch = window.fetch;
+  window.fetch = function(url, opts = {}) {
+    const email = localStorage.getItem('gram_user_email');
+    if (email) {
+      opts.headers = opts.headers || {};
+      if (opts.headers instanceof Headers) {
+        if (!opts.headers.has('x-user-email')) opts.headers.set('x-user-email', encodeURIComponent(email));
+      } else {
+        if (!opts.headers['x-user-email']) opts.headers['x-user-email'] = encodeURIComponent(email);
+      }
+    }
+    return _fetch(url, opts);
+  };
+})();
+
 async function loadAdminPageData() {
   try {
     const feedRes = await fetch('/api/admin/feed');
+    if (!feedRes.ok) {
+      if (feedRes.status === 401 || feedRes.status === 403) {
+        alert("Session expired. Please login again.");
+        window.location.href = '/login';
+        return;
+      }
+    }
     const feedData = await feedRes.json();
 
     // Update Counters — Total Users, Live Now (active sessions), Recent Logins, Active Reports
@@ -466,8 +492,11 @@ async function clearActivityLogs() {
 }
 
 async function verifyAdminAuth() {
+  const savedEmail = localStorage.getItem('gram_user_email');
   try {
-    const authRes = await fetch('/api/auth/status');
+    const authRes = await fetch('/api/auth/status', {
+      headers: savedEmail ? { 'x-user-email': encodeURIComponent(savedEmail) } : {}
+    });
     const authData = await authRes.json();
     if (!authData.loggedIn) {
       window.location.href = '/login';
@@ -488,10 +517,12 @@ verifyAdminAuth();
 
 async function logout() {
   if (!confirm("Are you sure you want to logout?")) return;
+  localStorage.removeItem('gram_user_email');
+  localStorage.removeItem('gram_user_role');
   try {
-    const res = await fetch('/api/auth/logout', { method: 'POST' });
-    if (res.ok) window.location.href = '/login';
-  } catch(e) { console.error(e); }
+    await fetch('/api/auth/logout', { method: 'POST' });
+  } catch(e) {}
+  window.location.href = '/login';
 }
 </script>
 </main>

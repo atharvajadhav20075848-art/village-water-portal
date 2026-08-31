@@ -407,6 +407,7 @@
     </div>
   </nav>
 
+  <script src="/public/js/auth-persist.js"></script>
   <script>
     let currentUser = null;
     let currentTaskTab = "pending";
@@ -457,8 +458,11 @@
 
     // Fetch and authenticate user session status
     async function checkAuth() {
+      const savedEmail = localStorage.getItem('gram_user_email');
       try {
-        const res = await fetch('/api/auth/status');
+        const res = await fetch('/api/auth/status', {
+          headers: savedEmail ? { 'x-user-email': encodeURIComponent(savedEmail) } : {}
+        });
         const data = await res.json();
         if (data.loggedIn) {
           currentUser = data.user;
