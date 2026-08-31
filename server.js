@@ -124,8 +124,18 @@ const Notification = mongoose.models.Notification || mongoose.model('Notificatio
   targetEmail: { type: String, default: '' },
   type: { type: String, default: 'general' }, // 'issue', 'broadcast', 'general'
   isEmergency: { type: Boolean, default: false },
+  soundUrl: { type: String, default: null },
+  playOnce: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
   readBy: { type: [String], default: [] }
+}));
+
+const AlertSound = mongoose.models.AlertSound || mongoose.model('AlertSound', new mongoose.Schema({
+  key: { type: String, default: 'global_alert_sound', unique: true },
+  name: { type: String, default: 'High-Pitch Emergency Siren' },
+  soundUrl: { type: String, default: '/public/sounds/emergency_siren.wav' },
+  playOnce: { type: Boolean, default: true },
+  updatedAt: { type: Date, default: Date.now }
 }));
 
 const Feed = mongoose.models.Feed || mongoose.model('Feed', new mongoose.Schema({
@@ -446,11 +456,69 @@ app.get('/api/notifications', async (req, res) => {
   res.json({ unreadCount, notifications: mapped });
 });
 
+// Get Global Alert Sound Setting
+app.get('/api/alert-sound', async (req, res) => {
+  let sound = await AlertSound.findOne({ key: 'global_alert_sound' });
+  if (!sound) {
+    sound = await AlertSound.create({
+      key: 'global_alert_sound',
+      name: 'High-Pitch Emergency Siren',
+      soundUrl: '/public/sounds/emergency_siren.wav',
+      playOnce: true
+    });
+  }
+  res.json(sound);
+});
+
+// Admin / Sarpanch Upload Custom Alert Sound
+app.post('/api/admin/alert-sound', requireAuth(['Admin', 'Sarpanch']), upload.single('sound'), async (req, res) => {
+  const { name, soundUrl, playOnce } = req.body;
+  let finalSoundUrl = req.file ? req.file.path : soundUrl;
+
+  if (!finalSoundUrl) {
+    return res.status(400).json({ error: 'Audio file or soundUrl is required' });
+  }
+
+  const sound = await AlertSound.findOneAndUpdate(
+    { key: 'global_alert_sound' },
+    {
+      name: name || (req.file ? req.file.originalname : 'Custom Uploaded Sound'),
+      soundUrl: finalSoundUrl,
+      playOnce: playOnce !== undefined ? (playOnce === 'true' || playOnce === true) : true,
+      updatedAt: new Date()
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
+
+  await Feed.create({
+    id: Date.now(),
+    name: req.session.user?.name || req.session.user?.email || 'Admin',
+    time: new Date().toISOString(),
+    action: `Updated Custom Alert Sound Pack: "${sound.name}" (Play Once: ${sound.playOnce})`,
+    location: req.session.user?.location || 'Panchayat Office',
+    ip: req.ip || '127.0.0.1',
+    phone: 'N/A'
+  });
+
+  res.json({ success: true, sound });
+});
+
 // Sarpanch / Admin can create custom notifications
-app.post('/api/notifications', requireAuth(['Admin', 'Sarpanch']), async (req, res) => {
-  const { title, message, targetRole, isEmergency } = req.body;
+app.post('/api/notifications', requireAuth(['Admin', 'Sarpanch']), upload.single('sound'), async (req, res) => {
+  const { title, message, targetRole, isEmergency, soundUrl, playOnce } = req.body;
   if (!title || !message) {
     return res.status(400).json({ error: 'Title and message are required' });
+  }
+
+  let finalSoundUrl = req.file ? req.file.path : (soundUrl || null);
+  let shouldPlayOnce = playOnce !== undefined ? (playOnce === 'true' || playOnce === true) : true;
+
+  if (!finalSoundUrl && isEmergency) {
+    const globalSound = await AlertSound.findOne({ key: 'global_alert_sound' });
+    if (globalSound && globalSound.soundUrl) {
+      finalSoundUrl = globalSound.soundUrl;
+      shouldPlayOnce = globalSound.playOnce !== false;
+    }
   }
 
   const newNotif = await Notification.create({
@@ -462,6 +530,8 @@ app.post('/api/notifications', requireAuth(['Admin', 'Sarpanch']), async (req, r
     targetRole: targetRole || 'all',
     type: isEmergency ? 'alert' : 'broadcast',
     isEmergency: Boolean(isEmergency),
+    soundUrl: finalSoundUrl,
+    playOnce: shouldPlayOnce, // Plays 1 time and stops!
     createdAt: new Date(),
     readBy: [req.session.user?.email]
   });
