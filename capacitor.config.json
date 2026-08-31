@@ -1,0 +1,15 @@
+{
+  "appId": "in.gov.village.watermanagement",
+  "appName": "Gram Jal Portal",
+  "webDir": "public",
+  "server": {
+    "url": "https://village-water-portal.vercel.app/app",
+    "cleartext": true,
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": true
+  }
+}

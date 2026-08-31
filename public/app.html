@@ -1,0 +1,535 @@
+<html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@600;700&amp;family=Atkinson+Hyperlegible+Next:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "primary-fixed": "#cbe6ff", "surface-container-high": "#ffe3cd", "primary-container": "#1a5276", "secondary": "#006b58", "on-tertiary-fixed": "#351000", "on-primary-fixed": "#001e30", "on-tertiary-fixed-variant": "#7b2f00", "background": "#fff8f5", "secondary-fixed": "#99f4da", "on-secondary": "#ffffff", "surface-container-low": "#fff1e8", "on-surface": "#2c1602", "primary-fixed-dim": "#9bccf6", "outline": "#72787f", "secondary-fixed-dim": "#7dd7be", "on-tertiary": "#ffffff", "inverse-on-surface": "#ffeee1", "on-secondary-fixed": "#002019", "tertiary-container": "#873400", "surface-container-lowest": "#ffffff", "surface-tint": "#2f6388", "inverse-primary": "#9bccf6", "on-primary-fixed-variant": "#0e4b6e", "surface-variant": "#ffdcbf", "on-primary": "#ffffff", "surface-dim": "#fdd2ae", "tertiary-fixed-dim": "#ffb695", "surface-container-highest": "#ffdcbf", "error-container": "#ffdad6", "on-tertiary-container": "#ffac86", "on-error": "#ffffff", "outline-variant": "#c1c7cf", "primary": "#003b5a", "surface": "#fff8f5", "error": "#ba1a1a", "surface-container": "#ffeadb", "on-error-container": "#93000a", "surface-bright": "#fff8f5", "on-surface-variant": "#41474e", "secondary-container": "#99f4da", "on-background": "#2c1602", "inverse-surface": "#442b12", "tertiary": "#622400", "tertiary-fixed": "#ffdbcc", "on-secondary-fixed-variant": "#005142", "on-secondary-container": "#00725d", "on-primary-container": "#94c5ee" }, "spacing": { "md": "16px", "sm": "8px", "container-margin": "20px", "lg": "24px", "xl": "40px", "xs": "4px", "unit": "4px", "touch-target": "48px", "gutter": "16px" }, "fontFamily": { "label-bold": ["Public Sans"], "body-lg": ["Atkinson Hyperlegible Next"], "status-badge": ["Public Sans"], "headline-lg": ["Public Sans"], "body-md": ["Atkinson Hyperlegible Next"], "headline-lg-mobile": ["Public Sans"], "headline-md": ["Public Sans"] }, "fontSize": { "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}], "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}], "status-badge": ["13px", {"lineHeight": "16px", "fontWeight": "600"}], "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}], "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}], "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}], "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}] } } } }</script><style>@layer base { .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } body { -webkit-tap-highlight-color: transparent; } } </style><link rel="manifest" href="/public/manifest.json">
+<meta name="theme-color" content="#003b5a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gram Jal">
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface font-body-md"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-container-margin flex items-center justify-between"><div class="flex items-center gap-sm"><img alt="Village Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI2oc_Spp8I6sgWaFMdsSaFj6HCk6B0FcQPjuW5ESxOxg1qEkS2UujcZNWktzJc8s5jwVXxfZcpXC-_nT7qoyZfCico0MZXOysuOfdYGH_BObereTalqbra5mCuW0jZ4k0JiWCqJUizNUxZ0eoHab6alVwGgUk4JVZXPKdivAOY5RPtWQVl8LjrPw0-RknTkFttseIwCfgur0EmzMkWGVWB07KHOChoA5J8VhKNoq1A7a7uu-LpA0X4w"><span id="appHeaderTitle" class="font-headline-md text-headline-md text-primary" data-i18n="nav_home">Home</span></div><div class="flex items-center gap-xs">
+    <!-- Notification Bell with Unread Count -->
+    <button onclick="toggleGlobalNotifications()" class="relative p-1.5 text-primary hover:bg-surface-container-low rounded-full transition-colors">
+      <span class="material-symbols-outlined text-[24px]">notifications</span>
+      <span id="globalNotifBadge" class="hidden absolute top-0 right-0 h-4 w-4 bg-error text-white text-[10px] font-bold rounded-full items-center justify-center">0</span>
+    </button>
+    <select class="lang-switcher bg-surface-container-low text-on-surface font-label-bold text-sm rounded-md border border-outline-variant px-2 py-1 focus:outline-none focus:border-primary mr-1"><option value="en">English</option><option value="mr">मराठी (Marathi)</option><option value="hi">हिंदी (Hindi)</option></select><button onclick="logout()" class="text-[11px] text-error font-label-bold uppercase hover:underline mr-1 py-1 px-2 border border-error rounded-full" data-i18n="auto_key_7">Logout</button><img alt="Profile" class="w-8 h-8 rounded-full object-cover border-2 border-primary-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9xl8M-8NUe2E-4TJUhfwoMlXWQVlOo8FbTAZqNrSnRR9n-xWoRkdxOiZ0gYvn2EEz2gdPSVbHCoVyu5cvyDyfJKN4I5NOsjR-sZIEUPPEf4W2S016llIQ4HI7CYcPFTdXF0ToDf0kE95ABGN3kxKHHAmi_4iHRaeqsgRVmU8YmfpghDR-hApGUFwoNvXr5ALTMF3F-s3NV42JV1UDqwfKhb8lpovhvJKnIQN5IGMG0dGHvu5LzFvSNQ"></div></div></header>
+
+<main class="relative w-full pt-16 pb-24 bg-surface">
+
+<!-- ════ VIEW 1: HOME ════ -->
+<div id="view-home" class="view-panel flex flex-col w-full gap-xl md:max-w-7xl md:mx-auto md:px-lg">
+  <section class="px-container-margin pt-4">
+    <div class="bg-primary text-on-primary p-lg rounded-xl flex items-center justify-between shadow-sm">
+      <div>
+        <h2 class="font-headline-lg-mobile text-headline-lg-mobile mb-xs" data-i18n="home_success">Village Success</h2>
+        <p class="font-body-md text-body-md text-primary-fixed" data-i18n="home_together">Together we keep our water flowing.</p>
+      </div>
+      <span class="material-symbols-outlined text-[48px] text-secondary-fixed">water_drop</span>
+    </div>
+  </section>
+
+  <!-- Broadcast Announcement Button for Sarpanch & Admin -->
+  <section id="sarpanchBroadcastCard" class="hidden px-container-margin">
+    <div class="bg-surface-container border border-outline-variant p-md rounded-xl flex items-center justify-between">
+      <div>
+        <h4 class="font-label-bold text-primary">Village Announcement</h4>
+        <p class="text-xs text-on-surface-variant">Send direct notification to all villagers</p>
+      </div>
+      <button onclick="openGlobalBroadcastModal(event)" class="px-3 py-2 bg-primary text-white text-xs font-label-bold rounded uppercase">Send Notice</button>
+    </div>
+  </section>
+
+  <section class="px-container-margin">
+    <h3 class="font-headline-md text-headline-md text-primary mb-md" data-i18n="home_how_it_works">How It Works</h3>
+    <div class="bg-surface-container text-on-surface p-lg rounded-xl">
+      <div class="flex flex-col gap-lg md:grid md:grid-cols-3 md:gap-lg">
+        <div class="flex items-start gap-md relative">
+          <div class="w-[2px] bg-secondary-fixed absolute left-6 top-10 bottom-[-24px] z-0"></div>
+          <div class="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-headline-md z-10 shrink-0 border-2 border-surface-container">1</div>
+          <div class="pt-2">
+            <h4 class="font-label-bold text-label-bold text-primary mb-xs uppercase tracking-wider">Report</h4>
+            <p class="font-body-md text-body-md text-on-surface-variant" data-i18n="auto_key_4">See a leak or broken pump? Take a photo and tell us where it is.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-md relative">
+          <div class="w-[2px] bg-secondary-fixed absolute left-6 top-10 bottom-[-24px] z-0"></div>
+          <div class="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-headline-md z-10 shrink-0 border-2 border-surface-container">2</div>
+          <div class="pt-2">
+            <h4 class="font-label-bold text-label-bold text-primary mb-xs uppercase tracking-wider" data-i18n="auto_key_2">Verify</h4>
+            <p class="font-body-md text-body-md text-on-surface-variant" data-i18n="auto_key_5">The village council checks the report and assigns a technician.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-md">
+          <div class="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-headline-md z-10 shrink-0 border-2 border-surface-container">3</div>
+          <div class="pt-2">
+            <h4 class="font-label-bold text-label-bold text-primary mb-xs uppercase tracking-wider" data-i18n="auto_key_3">Fix</h4>
+            <p class="font-body-md text-body-md text-on-surface-variant" data-i18n="auto_key_6">The problem is repaired and everyone is updated.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="px-container-margin">
+    <div class="flex items-center justify-between mb-md">
+      <h3 class="font-headline-md text-headline-md text-primary" data-i18n="auto_key_1">Recent Fixes</h3>
+      <a class="font-label-bold text-label-bold text-secondary uppercase tracking-wider" href="#" data-i18n="auto_key_8">View All</a>
+    </div>
+    <div id="recent-fixes-container" class="flex flex-col gap-md md:grid md:grid-cols-2 lg:grid-cols-3">
+      <!-- Dynamic Fixes -->
+    </div>
+  </section>
+
+  <div class="px-container-margin mt-md">
+    <button onclick="switchAppTab('report')" class="w-full min-h-[56px] bg-primary text-on-primary font-label-bold text-label-bold uppercase tracking-wider rounded-none flex items-center justify-center gap-sm active:bg-primary/90 transition-colors">
+      <span class="material-symbols-outlined">add_a_photo</span>
+      <span data-i18n="home_report_btn">Report a New Issue</span>
+    </button>
+  </div>
+</div>
+
+<!-- ════ VIEW 2: REPORT AN ISSUE ════ -->
+<div id="view-report" class="view-panel hidden flex-col w-full bg-surface md:mx-auto md:px-lg md:max-w-3xl">
+  <div class="px-container-margin pt-xl pb-md">
+    <h1 class="font-headline-lg-mobile text-on-surface mb-sm" data-i18n="auto_key_9">Report an Issue</h1>
+    <p class="font-body-lg text-on-surface-variant" data-i18n="auto_key_15">Help us keep our village running smoothly by reporting any problems you find.</p>
+  </div>
+
+  <div class="px-container-margin mb-xl">
+    <h2 class="font-headline-md text-on-surface mb-md" data-i18n="auto_key_10">Select Issue Type</h2>
+    <div class="flex flex-col gap-md">
+      <button onclick="setReportType('Water Related Issue', this)" class="type-opt-btn w-full flex items-center justify-between p-lg bg-surface-container-lowest border-2 border-primary rounded-xl transition-colors">
+        <div class="flex items-center gap-md">
+          <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-on-primary-fixed" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+          </div>
+          <div class="text-left">
+            <h3 class="font-headline-md text-on-surface" data-i18n="auto_key_13">Water Related Issue</h3>
+            <p class="font-body-md text-on-surface-variant line-clamp-1" data-i18n="auto_key_16">Leaks, pressure, quality, outages</p>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+      </button>
+
+      <button onclick="setReportType('Other Civic Issue', this)" class="type-opt-btn w-full flex items-center justify-between p-lg bg-surface-container-lowest border border-outline-variant rounded-xl transition-colors">
+        <div class="flex items-center gap-md">
+          <div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-on-secondary-fixed" style="font-variation-settings: 'FILL' 1;">location_city</span>
+          </div>
+          <div class="text-left">
+            <h3 class="font-headline-md text-on-surface" data-i18n="auto_key_14">Other Civic Issue</h3>
+            <p class="font-body-md text-on-surface-variant line-clamp-1" data-i18n="auto_key_17">Roads, lighting, waste, hazards</p>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="px-container-margin mb-xl">
+    <div class="flex items-center justify-between mb-md">
+      <h2 class="font-headline-md text-on-surface" data-i18n="auto_key_11">Location</h2>
+      <span class="inline-flex items-center gap-xs font-label-bold text-secondary">
+        <span class="relative flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-secondary"></span>
+        </span>
+        Auto-capturing
+      </span>
+    </div>
+    <div class="relative w-full h-36 rounded-xl overflow-hidden border border-outline-variant bg-surface-container-low p-md flex items-center">
+      <div class="flex items-start gap-sm">
+        <span class="material-symbols-outlined text-primary mt-xs shrink-0">location_on</span>
+        <div>
+          <p class="font-label-bold text-on-surface" data-i18n="auto_key_18">Current Location Detected</p>
+          <p id="displayLocationApp" class="font-body-md text-on-surface-variant italic">Fetching GPS...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-container-margin mb-xl">
+    <h2 class="font-headline-md text-on-surface mb-md" data-i18n="auto_key_12">Issue Details</h2>
+    <div class="flex flex-col gap-md">
+      <div>
+        <label class="block font-label-bold text-on-surface mb-sm" for="descriptionApp" data-i18n="auto_key_21">Description</label>
+        <textarea class="w-full p-md bg-surface-container-lowest border border-outline-variant rounded-xl font-body-lg text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none" id="descriptionApp" placeholder="Please describe the issue in detail..." rows="4"></textarea>
+      </div>
+      <div>
+        <span class="block font-label-bold text-on-surface mb-sm" data-i18n="auto_key_22">Photo Evidence (Optional)</span>
+        <input type="file" id="photoFileApp" accept="image/*" class="hidden">
+        <button id="photoBtnApp" type="button" onclick="document.getElementById('photoFileApp').click()" class="w-full flex flex-col items-center justify-center p-xl bg-surface-container border-2 border-dashed border-outline-variant rounded-xl active:bg-surface-container-high transition-colors">
+          <span class="material-symbols-outlined text-4xl text-on-surface-variant mb-sm">add_a_photo</span>
+          <span id="photoStatusApp" class="font-label-bold text-on-surface" data-i18n="auto_key_23">Tap to add a photo</span>
+          <span class="font-body-md text-on-surface-variant mt-xs" data-i18n="auto_key_24">Helps us locate and fix the issue faster</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-container-margin pb-xl">
+    <button onclick="submitReportFromApp()" id="submitBtnApp" class="w-full h-14 bg-primary text-on-primary font-label-bold rounded-xl flex items-center justify-center gap-sm hover:opacity-90 active:scale-[0.98] transition-all">
+      <span class="material-symbols-outlined text-xl">send</span>
+      Submit Report
+    </button>
+  </div>
+</div>
+
+<!-- ════ VIEW 3: TASKS (SARPANCH & ADMIN) ════ -->
+<div id="view-tasks" class="view-panel hidden flex-col w-full pb-6 md:max-w-7xl md:mx-auto md:px-lg">
+  <div class="px-container-margin pt-6 pb-4">
+    <h1 class="font-headline-lg text-headline-lg text-on-surface" data-i18n="auto_key_25">Manage Tasks</h1>
+    <p class="font-body-md text-body-md text-on-surface-variant mt-1" data-i18n="auto_key_26">Review and resolve community reports.</p>
+  </div>
+
+  <div class="px-container-margin mb-6">
+    <div class="flex p-1 bg-surface-container rounded-lg border border-outline-variant">
+      <button onclick="switchTaskTab(true)" class="flex-1 py-3 text-center font-label-bold text-label-bold bg-white text-primary border-2 border-primary rounded shadow-sm transition-all" id="btn-pending-app">
+        Pending
+      </button>
+      <button onclick="switchTaskTab(false)" class="flex-1 py-3 text-center font-label-bold text-label-bold text-on-surface-variant rounded border-2 border-transparent transition-all" id="btn-solved-app">
+        Solved
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-6 px-container-margin w-full" id="view-pending-tasks"></div>
+  <div class="hidden flex-col gap-6 px-container-margin w-full" id="view-solved-tasks"></div>
+</div>
+
+<!-- ════ VIEW 4: SUPPORT ════ -->
+<div id="view-support" class="view-panel hidden flex-col w-full px-container-margin py-lg gap-xl md:mx-auto md:px-lg md:max-w-3xl">
+  <div class="flex flex-col gap-sm">
+    <div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mb-sm text-on-primary-container">
+      <span class="material-symbols-outlined text-[32px]">support_agent</span>
+    </div>
+    <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface" data-i18n="auto_key_45">Need Help?</h1>
+    <p class="font-body-lg text-body-lg text-on-surface-variant" data-i18n="auto_key_48">We're here to assist you with any questions or concerns regarding village services.</p>
+  </div>
+
+  <div class="flex flex-col gap-md">
+    <a href="tel:5550199" class="w-full min-h-[56px] bg-primary text-on-primary rounded-lg font-label-bold text-label-bold flex items-center justify-center gap-sm active:scale-[0.98] transition-transform">
+      <span class="material-symbols-outlined">call</span>
+      Call Helpline (555-0199)
+    </a>
+  </div>
+
+  <div class="bg-surface-container rounded-xl p-md flex flex-col gap-sm border border-outline-variant">
+    <div class="flex items-center gap-sm text-on-surface">
+      <span class="material-symbols-outlined text-secondary">schedule</span>
+      <h2 class="font-headline-md text-headline-md" data-i18n="auto_key_46">Village Office Hours</h2>
+    </div>
+    <div class="grid grid-cols-2 gap-y-xs font-body-md text-body-md text-on-surface-variant mt-xs">
+      <span data-i18n="auto_key_50">Monday - Friday</span>
+      <span class="text-right font-medium" data-i18n="auto_key_51">9:00 AM - 5:00 PM</span>
+      <span data-i18n="auto_key_52">Saturday</span>
+      <span class="text-right font-medium" data-i18n="auto_key_53">10:00 AM - 2:00 PM</span>
+      <span data-i18n="auto_key_54">Sunday</span>
+      <span class="text-right font-medium text-outline" data-i18n="auto_key_55">Closed</span>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- BOTTOM NAVIGATION BAR (Exact original layout) -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-xl pb-safe shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary font-bold">
+  <div class="flex justify-between items-center h-16 px-gutter max-w-md mx-auto">
+    <button onclick="switchAppTab('home')" class="nav-app-btn flex flex-col items-center justify-center min-w-[64px] text-primary font-bold transition-colors" data-path="home">
+      <span class="material-symbols-outlined">home</span>
+      <span class="font-label-bold text-[10px] uppercase tracking-wider" data-i18n="nav_home">Home</span>
+    </button>
+    <button onclick="switchAppTab('report')" class="nav-app-btn flex flex-col items-center justify-center min-w-[64px] text-on-surface-variant transition-colors" data-path="report">
+      <span class="material-symbols-outlined">report_problem</span>
+      <span class="font-label-bold text-[10px] uppercase tracking-wider" data-i18n="nav_report_short">Report</span>
+    </button>
+    <button onclick="switchAppTab('tasks')" class="nav-app-btn flex flex-col items-center justify-center min-w-[64px] text-on-surface-variant transition-colors" data-path="tasks">
+      <span class="material-symbols-outlined">assignment_turned_in</span>
+      <span class="font-label-bold text-[10px] uppercase tracking-wider" data-i18n="nav_tasks">Tasks</span>
+    </button>
+    <button onclick="switchAppTab('support')" class="nav-app-btn flex flex-col items-center justify-center min-w-[64px] text-on-surface-variant transition-colors" data-path="support">
+      <span class="material-symbols-outlined">mail</span>
+      <span class="font-label-bold text-[10px] uppercase tracking-wider" data-i18n="nav_support_short">Support</span>
+    </button>
+  </div>
+</nav>
+
+<script>
+let currentRole = 'People/User';
+let selectedReportType = 'Water Related Issue';
+let realGps = 'Unknown';
+let realLocation = 'Unknown GPS Location';
+
+function switchAppTab(tabName) {
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+  document.querySelectorAll('.nav-app-btn').forEach(btn => {
+    btn.classList.remove('text-primary', 'font-bold');
+    btn.classList.add('text-on-surface-variant');
+  });
+
+  const target = document.getElementById(`view-${tabName}`);
+  if (target) target.classList.remove('hidden');
+
+  const activeBtn = document.querySelector(`.nav-app-btn[data-path="${tabName}"]`);
+  if (activeBtn) {
+    activeBtn.classList.remove('text-on-surface-variant');
+    activeBtn.classList.add('text-primary', 'font-bold');
+  }
+
+  const titles = { home: 'Home', report: 'Report', tasks: 'Tasks', support: 'Support' };
+  document.getElementById('appHeaderTitle').textContent = titles[tabName] || 'Portal';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (tabName === 'tasks') loadTasks();
+}
+
+function setReportType(type, btn) {
+  selectedReportType = type;
+  document.querySelectorAll('.type-opt-btn').forEach(b => {
+    b.classList.remove('border-2', 'border-primary');
+    b.classList.add('border', 'border-outline-variant');
+    b.querySelector('.material-symbols-outlined:last-child').textContent = 'chevron_right';
+    b.querySelector('.material-symbols-outlined:last-child').className = 'material-symbols-outlined text-outline-variant';
+  });
+  btn.classList.add('border-2', 'border-primary');
+  btn.classList.remove('border-outline-variant');
+  btn.querySelector('.material-symbols-outlined:last-child').textContent = 'check_circle';
+  btn.querySelector('.material-symbols-outlined:last-child').className = 'material-symbols-outlined text-primary';
+}
+
+document.getElementById('photoFileApp').addEventListener('change', () => {
+  const file = document.getElementById('photoFileApp').files[0];
+  if (file) {
+    document.getElementById('photoStatusApp').textContent = "Photo added: " + file.name;
+    document.getElementById('photoStatusApp').classList.add('text-secondary');
+  }
+});
+
+async function fetchGPS() {
+  try {
+    const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { timeout: 6000 }));
+    realGps = `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+    realLocation = `GPS: ${realGps}`;
+    document.getElementById('displayLocationApp').textContent = realLocation;
+    document.getElementById('displayLocationApp').classList.remove('italic');
+  } catch(e) {
+    document.getElementById('displayLocationApp').textContent = "Village Center (Network Estimate)";
+    realLocation = "Village Center";
+  }
+}
+fetchGPS();
+
+async function submitReportFromApp() {
+  const desc = document.getElementById('descriptionApp').value.trim();
+  const file = document.getElementById('photoFileApp').files[0];
+  if (!desc) {
+    alert("Please write a description for the issue.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('title', selectedReportType);
+  formData.append('type', selectedReportType);
+  formData.append('description', desc);
+  formData.append('location', realLocation);
+  formData.append('gps', realGps);
+  if (file) formData.append('photo', file);
+
+  try {
+    const res = await fetch('/api/issues', { method: 'POST', body: formData });
+    if (res.ok) {
+      alert("Report submitted successfully! You received a confirmation notice in notifications.");
+      document.getElementById('descriptionApp').value = '';
+      loadHomeFixes();
+      loadNotifications();
+      switchAppTab('home');
+    } else {
+      alert("Failed to submit issue.");
+    }
+  } catch(e) { console.error(e); }
+}
+
+async function loadHomeFixes() {
+  try {
+    const res = await fetch('/api/issues');
+    const issues = await res.json();
+    const solved = issues.filter(i => i.status === 'Resolved');
+    const container = document.getElementById('recent-fixes-container');
+    container.innerHTML = '';
+
+    if (solved.length === 0) {
+      container.innerHTML = '<p class="text-sm text-on-surface-variant italic">No solved issues yet.</p>';
+      return;
+    }
+
+    solved.forEach(item => {
+      container.innerHTML += `
+        <article class="bg-surface-container-lowest border border-outline-variant p-md rounded-lg">
+          <div class="flex justify-between items-start mb-md">
+            <div>
+              <h4 class="font-headline-md text-headline-md text-on-surface mb-xs">${item.title}</h4>
+              <p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs">
+                <span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
+                ${item.location}
+              </p>
+            </div>
+            <div class="bg-secondary text-on-secondary px-sm py-xs flex items-center gap-xs rounded-sm">
+              <span class="material-symbols-outlined text-[14px]">check_circle</span>
+              <span class="font-status-badge text-status-badge uppercase tracking-wider">Solved</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-sm mb-md">
+            <div class="relative">
+              <div class="absolute top-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded uppercase">Before</div>
+              <div class="w-full h-36 bg-cover bg-center border border-outline-variant rounded" style="background-image: url('${item.photoUrl}')"></div>
+            </div>
+            <div class="relative">
+              <div class="absolute top-2 left-2 bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded uppercase">After</div>
+              <div class="w-full h-36 bg-cover bg-center border border-outline-variant rounded" style="background-image: url('${item.resolutionPhotoUrl || item.photoUrl}')"></div>
+            </div>
+          </div>
+          <p class="font-body-md text-body-md text-on-surface-variant text-sm">${item.description}</p>
+        </article>
+      `;
+    });
+  } catch(e) { console.error(e); }
+}
+
+
+// Tasks Management (Sarpanch & Admin)
+function switchTaskTab(showPending) {
+  const pBtn = document.getElementById('btn-pending-app');
+  const sBtn = document.getElementById('btn-solved-app');
+  const pView = document.getElementById('view-pending-tasks');
+  const sView = document.getElementById('view-solved-tasks');
+  if (showPending) {
+    pView.classList.remove('hidden');
+    sView.classList.add('hidden');
+    pBtn.className = 'flex-1 py-3 text-center font-label-bold text-label-bold bg-white text-primary border-2 border-primary rounded shadow-sm transition-all';
+    sBtn.className = 'flex-1 py-3 text-center font-label-bold text-label-bold text-on-surface-variant rounded border-2 border-transparent transition-all';
+  } else {
+    sView.classList.remove('hidden');
+    pView.classList.add('hidden');
+    sBtn.className = 'flex-1 py-3 text-center font-label-bold text-label-bold bg-white text-primary border-2 border-primary rounded shadow-sm transition-all';
+    pBtn.className = 'flex-1 py-3 text-center font-label-bold text-label-bold text-on-surface-variant rounded border-2 border-transparent transition-all';
+  }
+}
+
+async function loadTasks() {
+  try {
+    const res = await fetch('/api/issues');
+    const issues = await res.json();
+    const pContainer = document.getElementById('view-pending-tasks');
+    const sContainer = document.getElementById('view-solved-tasks');
+    pContainer.innerHTML = '';
+    sContainer.innerHTML = '';
+
+    const pending = issues.filter(i => i.status === 'Pending');
+    const solved = issues.filter(i => i.status === 'Resolved');
+
+    if (pending.length === 0) {
+      pContainer.innerHTML = '<p class="text-sm text-on-surface-variant italic p-4 text-center">No pending tasks.</p>';
+    } else {
+      pending.forEach(item => {
+        pContainer.innerHTML += `
+          <div class="bg-white border border-outline-variant rounded-lg p-md flex flex-col gap-sm">
+            <div class="flex justify-between items-start">
+              <h4 class="font-headline-md text-on-surface">${item.title}</h4>
+              <span class="bg-error-container text-on-error-container px-2 py-0.5 rounded text-xs font-label-bold">Pending</span>
+            </div>
+            <p class="text-xs text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined text-[16px] text-primary">location_on</span> ${item.location}</p>
+            <p class="font-body-md text-sm text-on-surface">${item.description}</p>
+            <img src="${item.photoUrl}" class="w-full h-40 object-cover rounded border border-outline-variant" />
+            <button onclick="resolveTaskApp(${item.id})" class="w-full py-3 bg-primary text-white font-label-bold text-xs uppercase rounded flex items-center justify-center gap-xs">
+              <span class="material-symbols-outlined text-sm">check_circle</span> Mark as Resolved
+            </button>
+          </div>
+        `;
+      });
+    }
+
+    if (solved.length === 0) {
+      sContainer.innerHTML = '<p class="text-sm text-on-surface-variant italic p-4 text-center">No resolved tasks.</p>';
+    } else {
+      solved.forEach(item => {
+        sContainer.innerHTML += `
+          <div class="bg-white border border-outline-variant rounded-lg p-md flex flex-col gap-sm opacity-80">
+            <div class="flex justify-between items-start">
+              <h4 class="font-headline-md text-on-surface line-through">${item.title}</h4>
+              <span class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-xs font-label-bold">Resolved</span>
+            </div>
+            <p class="text-xs text-on-surface-variant">${item.location}</p>
+            <p class="font-body-md text-sm text-on-surface">${item.description}</p>
+          </div>
+        `;
+      });
+    }
+  } catch(e) { console.error(e); }
+}
+
+async function resolveTaskApp(id) {
+  if (!confirm("Confirm marking this task resolved? Photo will be attached.")) return;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    const formData = new FormData();
+    if (input.files[0]) formData.append('photo', input.files[0]);
+    try {
+      const res = await fetch(`/api/issues/${id}/resolve`, { method: 'PUT', body: formData });
+      if (res.ok) {
+        alert("Task resolved and village notified!");
+        loadTasks();
+        loadHomeFixes();
+        loadNotifications();
+      }
+    } catch(e) { console.error(e); }
+  };
+  input.click();
+}
+
+async function initApp() {
+  try {
+    const res = await fetch('/api/auth/status');
+    const data = await res.json();
+    if (!data.loggedIn) {
+      window.location.href = '/login';
+      return;
+    }
+    currentRole = data.user.role;
+    
+    // Show broadcast card and tasks tab for Sarpanch & Admin
+    if (currentRole === 'Sarpanch' || currentRole === 'Admin') {
+      document.getElementById('sarpanchBroadcastCard').classList.remove('hidden');
+      document.querySelectorAll('[data-path="tasks"]').forEach(el => el.style.display = 'flex');
+    } else {
+      document.querySelectorAll('[data-path="tasks"]').forEach(el => el.style.display = 'none');
+    }
+
+    loadHomeFixes();
+    loadNotifications();
+    setInterval(loadNotifications, 20000);
+  } catch(e) { console.error(e); }
+}
+
+async function logout() {
+  if (!confirm("Are you sure you want to logout?")) return;
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/login';
+  } catch(e) { console.error(e); }
+}
+
+initApp();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/public/sw.js').catch(err => console.log('SW registration failed:', err));
+}
+</script>
+<script src="/public/js/i18n.js"></script>
+<script src="/public/js/notifications.js"></script>
+</body></html>

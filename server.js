@@ -14,14 +14,13 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 // Load environment variables
 dotenv.config();
 
-// --- JUGAAD: Prevent server from crashing on errors ---
+// Prevent server crash on uncaught errors
 process.on('uncaughtException', function (err) {
   console.error('Caught exception: ', err);
 });
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
-// ------------------------------------------------------
 
 const app = express();
 app.use(cors());
@@ -32,31 +31,55 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 app.set('trust proxy', true);
 
 app.use(session({
-  secret: 'gram-panchayat-water-secret-key-12345',
+  secret: process.env.SESSION_SECRET || 'gram-panchayat-water-secret-key-12345',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 }
+  cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }
 }));
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// ── Database Setup (MongoDB) ───────────────────────────────────────
-const MONGO_URI = process.env.MONGO_URI;
+// ── Database Setup (MongoDB with Serverless Caching) ───────────────────
+const MONGO_URI = process.env.MONGO_URI || "mongodb+srv://atharvajadhav20075848_db_user:T6Xj3t4KOCtpfbXT@cluster0.hrxwdsn.mongodb.net/?appName=Cluster0";
 
-mongoose.connect(MONGO_URI)
-  .then(() => console.log('Connected to MongoDB Live Database!'))
-  .catch(err => {
-    console.error('Failed to connect to MongoDB. Have you added the connection string to .env?');
-    console.error(err);
-  });
+let isConnecting = false;
+async function connectToDatabase() {
+  if (mongoose.connection.readyState === 1) return mongoose.connection;
+  if (isConnecting) {
+    await new Promise(resolve => mongoose.connection.once('open', resolve));
+    return mongoose.connection;
+  }
+  try {
+    isConnecting = true;
+    await mongoose.connect(MONGO_URI, {
+      serverSelectionTimeoutMS: 8000,
+      socketTimeoutMS: 45000,
+    });
+    console.log('Connected to MongoDB Live Database!');
+    await seedDefaultUsers();
+  } catch (err) {
+    console.error('Failed to connect to MongoDB:', err.message);
+  } finally {
+    isConnecting = false;
+  }
+}
+connectToDatabase();
 
-const User = mongoose.model('User', new mongoose.Schema({
+app.use(async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    await connectToDatabase();
+  }
+  next();
+});
+
+// ── Schemas & Models ──────────────────────────────────────────────────
+const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String },
   role: { type: String, default: 'People/User' }
 }));
 
-const Issue = mongoose.model('Issue', new mongoose.Schema({
+const Issue = mongoose.models.Issue || mongoose.model('Issue', new mongoose.Schema({
   id: { type: Number, required: true },
   title: String,
   type: String,
@@ -65,13 +88,28 @@ const Issue = mongoose.model('Issue', new mongoose.Schema({
   lat: Number,
   lon: Number,
   photoUrl: String,
+  reporter: { type: String, default: 'Resident' },
+  reporterEmail: { type: String, default: '' },
   status: { type: String, default: 'Pending' },
   resolvedBy: String,
   resolutionPhotoUrl: String,
   createdAt: { type: Date, default: Date.now }
 }));
 
-const Feed = mongoose.model('Feed', new mongoose.Schema({
+const Notification = mongoose.models.Notification || mongoose.model('Notification', new mongoose.Schema({
+  id: { type: Number, required: true },
+  title: { type: String, required: true },
+  message: { type: String, required: true },
+  senderName: { type: String, default: 'Gram Panchayat' },
+  senderRole: { type: String, default: 'System' },
+  targetRole: { type: String, default: 'all' }, // 'all', 'People/User', 'Sarpanch', 'Admin'
+  targetEmail: { type: String, default: '' },
+  type: { type: String, default: 'general' }, // 'issue', 'broadcast', 'general'
+  createdAt: { type: Date, default: Date.now },
+  readBy: { type: [String], default: [] }
+}));
+
+const Feed = mongoose.models.Feed || mongoose.model('Feed', new mongoose.Schema({
   id: Number,
   name: String,
   time: String,
@@ -81,7 +119,7 @@ const Feed = mongoose.model('Feed', new mongoose.Schema({
   phone: String
 }));
 
-const ActiveSession = mongoose.model('ActiveSession', new mongoose.Schema({
+const ActiveSession = mongoose.models.ActiveSession || mongoose.model('ActiveSession', new mongoose.Schema({
   email: String,
   name: String,
   role: String,
@@ -92,16 +130,19 @@ const ActiveSession = mongoose.model('ActiveSession', new mongoose.Schema({
   loginTime: String
 }));
 
-// Function to seed default users if db is empty
 async function seedDefaultUsers() {
-  const count = await User.countDocuments();
-  if (count === 0) {
-    await User.insertMany([
-      { email: 'admin@village.gov.in', role: 'Admin', password: 'admin123' },
-      { email: 'sarpanch@village.gov.in', role: 'Sarpanch', password: 'sarpanch123' },
-      { email: 'resident@village.gov.in', role: 'People/User', password: 'user123' }
-    ]);
-    console.log("Seeded default users to MongoDB.");
+  try {
+    const count = await User.countDocuments();
+    if (count === 0) {
+      await User.insertMany([
+        { email: 'admin@village.gov.in', role: 'Admin', password: 'admin123' },
+        { email: 'sarpanch@village.gov.in', role: 'Sarpanch', password: 'sarpanch123' },
+        { email: 'resident@village.gov.in', role: 'People/User', password: 'user123' }
+      ]);
+      console.log("Seeded default users to MongoDB.");
+    }
+  } catch (e) {
+    console.error('Error seeding users:', e.message);
   }
 }
 mongoose.connection.once('open', seedDefaultUsers);
@@ -165,6 +206,14 @@ function formatLocationString(loc) {
   return parts.join(', ') || 'Unknown Location';
 }
 
+function requireAuth(allowedRoles) {
+  return (req, res, next) => {
+    if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
+    if (allowedRoles && !allowedRoles.includes(req.session.user.role)) return res.status(403).json({ error: 'Forbidden' });
+    next();
+  };
+}
+
 // ── Authentication Routes ──────────────────────────────────────────
 
 app.post('/api/auth/manual', async (req, res) => {
@@ -173,21 +222,21 @@ app.post('/api/auth/manual', async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
-  const user = await User.findOne({ email: email.toLowerCase() });
+  const user = await User.findOne({ email: email.toLowerCase().trim() });
 
   if (!user || user.password !== password) {
     return res.status(401).json({ error: 'Access Denied', message: 'Invalid email or password.' });
   }
 
-  const clientIP = req.ip || req.connection.remoteAddress || '127.0.0.1';
+  const clientIP = req.ip || req.connection?.remoteAddress || '127.0.0.1';
   let locationStr = 'Unknown Location';
   let finalLat = 0;
   let finalLon = 0;
 
   if (lat && lon) {
-    finalLat = lat;
-    finalLon = lon;
-    locationStr = `GPS: ${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+    finalLat = parseFloat(lat);
+    finalLon = parseFloat(lon);
+    locationStr = `GPS: ${finalLat.toFixed(4)}, ${finalLon.toFixed(4)}`;
   } else {
     const location = await getLocationFromIP(clientIP);
     locationStr = formatLocationString(location);
@@ -239,15 +288,15 @@ app.post('/api/auth/google', async (req, res) => {
     return res.status(403).json({ error: 'Access Denied', message: 'Email not authorized.' });
   }
 
-  const clientIP = req.ip || req.connection.remoteAddress || '127.0.0.1';
+  const clientIP = req.ip || req.connection?.remoteAddress || '127.0.0.1';
   let locationStr = 'Unknown Location';
   let finalLat = 0;
   let finalLon = 0;
 
   if (lat && lon) {
-    finalLat = lat;
-    finalLon = lon;
-    locationStr = `GPS: ${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+    finalLat = parseFloat(lat);
+    finalLon = parseFloat(lon);
+    locationStr = `GPS: ${finalLat.toFixed(4)}, ${finalLon.toFixed(4)}`;
   } else {
     const location = await getLocationFromIP(clientIP);
     locationStr = formatLocationString(location);
@@ -300,13 +349,73 @@ app.post('/api/auth/logout', async (req, res) => {
   });
 });
 
-function requireAuth(allowedRoles) {
-  return (req, res, next) => {
-    if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
-    if (allowedRoles && !allowedRoles.includes(req.session.user.role)) return res.status(403).json({ error: 'Forbidden' });
-    next();
+// ── Notifications APIs ──────────────────────────────────────────────
+
+// Fetch notifications for current user
+app.get('/api/notifications', async (req, res) => {
+  const userEmail = req.session.user?.email || '';
+  const userRole = req.session.user?.role || 'People/User';
+
+  const query = {
+    $or: [
+      { targetRole: 'all' },
+      { targetRole: userRole },
+      { targetEmail: userEmail }
+    ]
   };
-}
+
+  const notifs = await Notification.find(query).sort({ createdAt: -1 }).limit(30);
+  const mapped = notifs.map(n => {
+    const obj = n.toObject();
+    obj.isRead = userEmail ? (obj.readBy || []).includes(userEmail) : false;
+    return obj;
+  });
+
+  const unreadCount = mapped.filter(n => !n.isRead).length;
+  res.json({ unreadCount, notifications: mapped });
+});
+
+// Sarpanch / Admin can create custom notifications
+app.post('/api/notifications', requireAuth(['Admin', 'Sarpanch']), async (req, res) => {
+  const { title, message, targetRole } = req.body;
+  if (!title || !message) {
+    return res.status(400).json({ error: 'Title and message are required' });
+  }
+
+  const newNotif = await Notification.create({
+    id: Date.now(),
+    title: title.trim(),
+    message: message.trim(),
+    senderName: req.session.user?.name || req.session.user?.email || 'Sarpanch Office',
+    senderRole: req.session.user?.role || 'Sarpanch',
+    targetRole: targetRole || 'all',
+    type: 'broadcast',
+    createdAt: new Date(),
+    readBy: [req.session.user?.email]
+  });
+
+  await Feed.create({
+    id: Date.now(),
+    name: req.session.user?.name || 'Sarpanch',
+    time: new Date().toISOString(),
+    action: `Sent village notification: "${title}"`,
+    location: req.session.user?.location || 'Panchayat Bhavan',
+    ip: req.session.user?.ip || '::1',
+    phone: 'N/A'
+  });
+
+  res.json({ success: true, notification: newNotif });
+});
+
+// Mark notifications read
+app.put('/api/notifications/read-all', requireAuth(), async (req, res) => {
+  const userEmail = req.session.user.email;
+  await Notification.updateMany(
+    { readBy: { $ne: userEmail } },
+    { $addToSet: { readBy: userEmail } }
+  );
+  res.json({ success: true });
+});
 
 // ── Admin Routes ────────────────────────────────────────────
 app.get('/api/admin/feed', requireAuth(['Admin']), async (req, res) => {
@@ -321,6 +430,7 @@ app.delete('/api/admin/feed', requireAuth(['Admin']), async (req, res) => {
   await Feed.deleteMany({});
   res.json({ success: true });
 });
+
 app.get('/api/admin/users', requireAuth(['Admin']), async (req, res) => {
   const users = await User.find({}, { _id: 0, __v: 0 });
   res.json(users);
@@ -400,10 +510,39 @@ app.post('/api/issues', requireAuth(), upload.single('photo'), async (req, res) 
     location,
     lat: finalLat,
     lon: finalLon,
-    photoUrl: req.file ? req.file.path : null, // Cloudinary provides secure URL in req.file.path
+    photoUrl: req.file ? req.file.path : null,
+    reporter: req.session.user.name || req.session.user.email,
+    reporterEmail: req.session.user.email,
     status: 'Pending'
   });
   await newIssue.save();
+
+  // 1. Send instant in-app notification to the reporting User
+  await Notification.create({
+    id: Date.now() + 1,
+    title: `Report Submitted: ${title}`,
+    message: `Your issue at "${location}" has been received. Panchayat team will inspect and take action soon.`,
+    senderName: 'Gram Jal Portal',
+    senderRole: 'System',
+    targetEmail: req.session.user.email,
+    targetRole: 'People/User',
+    type: 'issue',
+    createdAt: new Date(),
+    readBy: []
+  });
+
+  // 2. Send instant in-app notification to Sarpanch and Admin
+  await Notification.create({
+    id: Date.now() + 2,
+    title: `New Issue: ${title}`,
+    message: `Reported by ${req.session.user.name} at ${location}: "${description}"`,
+    senderName: req.session.user.name,
+    senderRole: req.session.user.role,
+    targetRole: 'Sarpanch',
+    type: 'issue',
+    createdAt: new Date(),
+    readBy: []
+  });
 
   await Feed.create({
     id: Date.now(),
@@ -439,6 +578,19 @@ app.put('/api/issues/:id/resolve', requireAuth(['Admin', 'Sarpanch']), upload.si
 
   if (!updated) return res.status(404).json({ error: 'Issue not found' });
 
+  // Send resolved notification to village
+  await Notification.create({
+    id: Date.now(),
+    title: `Issue Resolved: ${updated.title}`,
+    message: `Issue at ${updated.location} was resolved by ${req.session.user.role} (${req.session.user.name}).`,
+    senderName: req.session.user.name,
+    senderRole: req.session.user.role,
+    targetRole: 'all',
+    type: 'issue',
+    createdAt: new Date(),
+    readBy: []
+  });
+
   await Feed.create({
     id: Date.now(),
     name: req.session.user.name,
@@ -452,7 +604,7 @@ app.put('/api/issues/:id/resolve', requireAuth(['Admin', 'Sarpanch']), upload.si
   res.json({ success: true, issue: updated });
 });
 
-// HTML Pages Setup (Direct serving logic so they can view it from localhost:3000)
+// HTML Pages Setup
 const pages = {
   '/login': 'login_demo_role_detection',
   '/home': 'village_progress_home',
@@ -467,14 +619,26 @@ Object.entries(pages).forEach(([route, folder]) => {
     res.sendFile(path.join(__dirname, folder, 'code.html'));
   });
 });
+
+// Mobile App Route (Same original design system)
+app.get('/app', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'app.html'));
+});
+app.get('/mobile', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'app.html'));
+});
+
 app.get('/', (req, res) => res.redirect('/login'));
 
 // Start the server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+  });
+}
 
+// Self-ping to prevent sleep
 const cron = require('node-cron');
 const https = require('https');
 cron.schedule('*/1 * * * *', () => {
@@ -483,9 +647,8 @@ cron.schedule('*/1 * * * *', () => {
   const getModule = url.startsWith('https') ? https : http;
   
   getModule.get(url, (res) => {
-    console.log(`Self-ping status: ${res.statusCode}`);
-    res.resume(); // Consume response data to free up memory
-  }).on('error', (err) => {
-    console.error(`Self-ping failed: ${err.message}`);
-  });
+    res.resume();
+  }).on('error', () => {});
 });
+
+module.exports = app;
