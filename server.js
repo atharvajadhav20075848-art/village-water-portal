@@ -176,7 +176,7 @@ async function seedDefaultUsers() {
 }
 mongoose.connection.once('open', seedDefaultUsers);
 
-// ── Cloudinary Image Upload Setup ──────────────────────────────────
+// ── Cloudinary Image & Audio Upload Setup ────────────────────────────
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -187,10 +187,23 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'village_water_portal',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp']
+    resource_type: 'auto'
   }
 });
-const upload = multer({ storage });
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 25 * 1024 * 1024 }
+});
+
+const uploadSafe = (fieldName) => (req, res, next) => {
+  upload.single(fieldName)(req, res, (err) => {
+    if (err) {
+      console.warn(`[Multer Warning] ${fieldName} upload fallback:`, err.message);
+      req.file = null;
+    }
+    next();
+  });
+};
 
 // ── IP Geolocation Helper ──────────────────────────────────────────
 function getLocationFromIP(ip) {
@@ -471,7 +484,7 @@ app.get('/api/alert-sound', async (req, res) => {
 });
 
 // Admin / Sarpanch Upload Custom Alert Sound
-app.post('/api/admin/alert-sound', requireAuth(['Admin', 'Sarpanch']), upload.single('sound'), async (req, res) => {
+app.post('/api/admin/alert-sound', requireAuth(['Admin', 'Sarpanch']), uploadSafe('sound'), async (req, res) => {
   const { name, soundUrl, playOnce } = req.body;
   let finalSoundUrl = req.file ? req.file.path : soundUrl;
 
@@ -504,7 +517,7 @@ app.post('/api/admin/alert-sound', requireAuth(['Admin', 'Sarpanch']), upload.si
 });
 
 // Sarpanch / Admin can create custom notifications
-app.post('/api/notifications', requireAuth(['Admin', 'Sarpanch']), upload.single('sound'), async (req, res) => {
+app.post('/api/notifications', requireAuth(['Admin', 'Sarpanch']), uploadSafe('sound'), async (req, res) => {
   const { title, message, targetRole, isEmergency, soundUrl, playOnce } = req.body;
   if (!title || !message) {
     return res.status(400).json({ error: 'Title and message are required' });
@@ -650,7 +663,7 @@ app.get('/api/issues', async (req, res) => {
   res.json(issues);
 });
 
-app.post('/api/issues', upload.single('photo'), async (req, res) => {
+app.post('/api/issues', uploadSafe('photo'), async (req, res) => {
   const { title, type, description, location, gps } = req.body;
   
   let finalLat = 0, finalLon = 0;
@@ -739,7 +752,7 @@ app.delete('/api/issues/:id', requireAuth(['Admin']), async (req, res) => {
   res.json({ success: true });
 });
 
-app.put('/api/issues/:id/resolve', upload.single('photo'), async (req, res) => {
+app.put('/api/issues/:id/resolve', uploadSafe('photo'), async (req, res) => {
   const issueId = parseInt(req.params.id, 10);
   const existing = await Issue.findOne({ id: issueId });
   if (!existing) return res.status(404).json({ error: 'Issue not found' });

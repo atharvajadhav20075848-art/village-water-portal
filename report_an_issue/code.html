@@ -235,8 +235,15 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
       headers: savedEmail ? { 'x-user-email': encodeURIComponent(savedEmail) } : {},
       body: formData
     });
-    const result = await res.json();
-    if (res.ok && result.success) {
+
+    let result = {};
+    try {
+      result = await res.json();
+    } catch(parseErr) {
+      result = { error: res.statusText || "Server error (" + res.status + ")" };
+    }
+
+    if (res.ok && (result.success || result.issue)) {
       alert("✅ Issue reported successfully!\nPanchayat team has been alerted.");
       window.location.href = '/home';
     } else {
@@ -245,8 +252,8 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
       submitBtn.innerHTML = originalText;
     }
   } catch (err) {
-    console.error(err);
-    alert("Error communicating with server.");
+    console.error("Issue submit network error:", err);
+    alert("Network Error: " + (err.message || "Could not reach server. Please check connection."));
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalText;
   }
